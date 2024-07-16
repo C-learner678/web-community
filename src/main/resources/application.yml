@@ -1,0 +1,36 @@
+server:
+  port:
+    8888
+  front-port:
+    8889
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: 123456
+    url: jdbc:mysql://localhost:3306/web_community?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useSSL=false
+  redis:
+    host: 127.0.0.1
+    database: 1
+    port: 6379
+    password:
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: admin
+    password: 123456
+    virtual-host: web-community
+
+jwt:
+  issuer: web-community # 签发者
+  secret: 123456 # 签名密钥
+  expire: 86400 # jwt的有效期
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # 开启sql日志
+
+image:
+  image-path: C:/files/web-community-images/
+

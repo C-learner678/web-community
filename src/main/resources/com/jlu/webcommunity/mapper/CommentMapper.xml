@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jlu.webcommunity.mapper.CommentMapper">
+    <sql id="limit">
+        <if test="pageParam != null">
+            limit #{pageParam.offset}, #{pageParam.limit}
+        </if>
+    </sql>
+
+    <select id="selectCommentByPage" resultType="com.jlu.webcommunity.entity.vo.SelectCommentByPageVo">
+        select c.id, c.user_id, ui.front_name, ui.avatar, c.post_id, c.content, c.create_time, c.update_time
+        from comment c
+        inner join user_info ui on c.user_id = ui.user_id
+        where
+        c.deleted = 0
+        <if test="postId != null">
+            and c.post_id = #{postId}
+        </if>
+        <if test="userId != null">
+            and c.user_id = #{userId}
+        </if>
+        order by c.update_time asc
+        <include refid="limit"/>
+    </select>
+
+    <select id="selectCommentCount" resultType="Integer">
+        select count(*)
+        from comment c
+        inner join user_info ui on c.user_id = ui.user_id
+        where
+        c.deleted = 0
+        <if test="postId != null">
+            and c.post_id = #{postId}
+        </if>
+        <if test="userId != null">
+            and c.user_id = #{userId}
+        </if>
+        order by c.update_time asc
+    </select>
+</mapper>

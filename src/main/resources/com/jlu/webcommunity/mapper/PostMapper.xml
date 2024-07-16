@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jlu.webcommunity.mapper.PostMapper">
+    <sql id="limit">
+        <if test="pageParam != null">
+            limit #{pageParam.offset}, #{pageParam.limit}
+        </if>
+    </sql>
+
+    <select id="selectPostByPage" resultType="com.jlu.webcommunity.entity.vo.SelectPostByPageVo">
+        select p.id, p.user_id, ui.front_name as userFrontName, p.section_id, s.name as sectionName, p.title, p.create_time, p.update_time
+        from post p
+        inner join user_info ui on p.user_id = ui.user_id
+        inner join section s on p.section_id = s.id
+        where
+        p.deleted = 0
+        <if test="sectionId != null">
+            and p.section_id = #{sectionId}
+        </if>
+        <if test="userId != null">
+            and p.user_id = #{userId}
+        </if>
+        <if test="top != null">
+            and p.top = #{top}
+        </if>
+        order by p.update_time desc
+        <include refid="limit"/>
+    </select>
+
+    <select id="selectPostCount" resultType="Integer">
+        select count(*)
+        from post p
+        inner join user_info ui on p.user_id = ui.user_id
+        inner join section s on p.section_id = s.id
+        where
+        p.deleted = 0
+        <if test="sectionId != null">
+            and p.section_id = #{sectionId}
+        </if>
+        <if test="userId != null">
+            and p.user_id = #{userId}
+        </if>
+        <if test="top != null">
+            and p.top = #{top}
+        </if>
+    </select>
+</mapper>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jlu.webcommunity.mapper.UserFollowMapper">
+    <sql id="limit">
+        <if test="pageParam != null">
+            limit #{pageParam.offset}, #{pageParam.limit}
+        </if>
+    </sql>
+
+    <select id="selectUserFollowByPage" resultType="com.jlu.webcommunity.entity.UserInfo">
+        select ui.user_id as userId, ui.front_name as frontName, ui.info as info, ui.avatar as avatar
+        from user_follow uf
+        inner join user_info ui on ui.user_id = uf.user_id
+        where
+        ui.deleted = 0
+        and uf.deleted = 0
+        <if test="followUserId != null">
+            and uf.follow_user_id = #{followUserId}
+        </if>
+        order by uf.update_time desc
+        <include refid="limit"/>
+    </select>
+
+    <select id="selectUserFollowerByPage" resultType="com.jlu.webcommunity.entity.UserInfo">
+        select ui.user_id as userId, ui.front_name as frontName, ui.info as info, ui.avatar as avatar
+        from user_follow uf
+        inner join user_info ui on ui.user_id = uf.follow_user_id
+        where
+        ui.deleted = 0
+        and uf.deleted = 0
+        <if test="userId != null">
+            and uf.user_id = #{userId}
+        </if>
+        order by uf.update_time desc
+        <include refid="limit"/>
+    </select>
+
+    <select id="selectUserFollowCount" resultType="com.jlu.webcommunity.entity.vo.SelectUserFollowCountVo">
+        select ui2.user_id userId, if(c is not null, c, 0) cnt
+        from user_info ui2
+        left join
+         (
+             select ui.user_id uid, count(*) c
+             from user_info ui
+             inner join user_follow uf on uf.follow_user_id = ui.user_id
+             where
+             uf.deleted = '0'
+             group by ui.user_id
+         ) c on c.uid = ui2.user_id
+        group by ui2.user_id
+    </select>
+
+    <select id="selectUserFollowerCount" resultType="com.jlu.webcommunity.entity.vo.SelectUserFollowCountVo">
+        select ui2.user_id userId, if(c is not null, c, 0) cnt
+        from user_info ui2
+        left join
+        (
+            select ui.user_id uid, count(*) c
+            from user_info ui
+            inner join user_follow uf on uf.user_id = ui.user_id
+            where
+            uf.deleted = '0'
+            group by ui.user_id
+        ) c on c.uid = ui2.user_id
+        group by ui2.user_id
+    </select>
+</mapper>
