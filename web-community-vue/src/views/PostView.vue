@@ -14,7 +14,7 @@
           作者：<a :href="authorUrl">{{ author.frontName }}</a>&nbsp;&nbsp;&nbsp;
           所属板块：<a :href="sectionUrl">{{ section.name }}</a>&nbsp;&nbsp;&nbsp;
           <el-button type="text" @click="clickDeletePost"
-            v-if="user.role == 'admin' || user.userId == post.userId">删除</el-button><br>
+            v-if="user != null && (user.role == 'admin' || user.userId == post.userId)">删除</el-button><br>
           <v-md-preview :text="post.content"></v-md-preview>
         </div>
         <div>
@@ -52,7 +52,7 @@
               prop="op"
               label="操作"
               width="180"
-              v-if="user.role=='admin'">
+              v-if="user != null && user.role=='admin'">
               <template slot-scope="scope">
                 <el-button @click="clickDeleteComment(scope.row)" type="text" size="small">删除</el-button>
               </template>

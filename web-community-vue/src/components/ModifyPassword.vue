@@ -25,6 +25,7 @@
 </template>
 
 <script>
+import md5 from 'js-md5'
 import { modifyPassword } from '@/api/userApi'
 
 export default {
@@ -34,7 +35,7 @@ export default {
     submitModifyForm(){
       this.$refs.ModifyPasswordForm.validate((valid) => {
         if (valid) {
-          modifyPassword(this.ModifyPasswordForm.oldPassword, this.ModifyPasswordForm.newPassword)
+          modifyPassword(md5(this.ModifyPasswordForm.oldPassword), md5(this.ModifyPasswordForm.newPassword))
           .then((res) => {
             this.$message.success('修改密码成功')
             window.location.reload()

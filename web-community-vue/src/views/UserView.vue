@@ -35,7 +35,7 @@
           <el-button v-if="isCurrentUserFollow==true" size="small" type="primary" @click="clickRemoveFollow">
             取消关注
           </el-button>&nbsp;&nbsp;
-          <el-switch v-if="currentUser.role=='admin'" v-model="user.deleted" active-text="封禁" @change="clickBan">
+          <el-switch v-if="currentUser != null && currentUser.role=='admin'" v-model="user.deleted" active-text="封禁" @change="clickBan">
           </el-switch>
           <br>
           <div style="font-weight: bold">
@@ -72,7 +72,7 @@
               prop="op"
               label="操作"
               width="180"
-              v-if="currentUser.role=='admin'">
+              v-if="currentUser != null && currentUser.role=='admin'">
               <template slot-scope="scope">
                 <el-button @click="clickDeletePost(scope.row)" type="text" size="small">删除</el-button>
               </template>

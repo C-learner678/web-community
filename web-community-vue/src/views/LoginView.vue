@@ -50,8 +50,10 @@
 </template>
 
 <script>
-import Cookies from "js-cookie";
+import Cookies from "js-cookie"
+import md5 from 'js-md5'
 import {login, register, getCaptcha} from "@/api/userApi"
+
 
 export default {
   name: 'LoginView',
@@ -59,7 +61,7 @@ export default {
     submitLoginForm() {
       this.$refs.loginForm.validate((valid) => {
         if (valid) {
-          login(this.loginForm.name, this.loginForm.password, this.loginForm.captcha, this.loginForm.key)
+          login(this.loginForm.name, md5(this.loginForm.password), this.loginForm.captcha, this.loginForm.key)
           .then((res) => {
             Cookies.set("username", this.loginForm.name, { expires: 30 })
             sessionStorage.setItem('userToken', res.result)
@@ -76,7 +78,7 @@ export default {
     submitRegisterForm() {
       this.$refs.loginForm.validate((valid) => {
         if (valid) {
-          register(this.loginForm.name, this.loginForm.password, this.loginForm.captcha, this.loginForm.key)
+          register(this.loginForm.name, md5(this.loginForm.password), this.loginForm.captcha, this.loginForm.key)
           .then((res) => {
             Cookies.set("username", this.loginForm.name, { expires: 30 })
             sessionStorage.setItem('userToken', res.result)

@@ -5,7 +5,7 @@ import com.jlu.webcommunity.aop.checkBanned.CheckBanned;
 import com.jlu.webcommunity.aop.checkLogin.CheckLogin;
 import com.jlu.webcommunity.entity.Post;
 import com.jlu.webcommunity.entity.dto.post.*;
-import com.jlu.webcommunity.entity.vo.SelectPostByPageVo;
+import com.jlu.webcommunity.entity.vo.GetPostByPageVo;
 import com.jlu.webcommunity.enums.StatusCodeEnum;
 import com.jlu.webcommunity.controller.result.Result;
 import com.jlu.webcommunity.service.PostService;
@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @Slf4j
@@ -65,7 +66,7 @@ public class PostController {
 
     @PostMapping("/getPostByPage")
     public Result getUserPostByPage(@RequestBody GetPostByPageDto dto){
-        List<SelectPostByPageVo> posts = postService.getPostByPage(dto);
+        List<GetPostByPageVo> posts = postService.getPostByPage(dto);
         return Result.success(posts);
     }
 
@@ -93,5 +94,15 @@ public class PostController {
         }else{
             return Result.fail(StatusCodeEnum.DELETE_POST_FAILED);
         }
+    }
+
+    @PostMapping("/getSearchPostCount")
+    public Result getSearchPostCount(@RequestBody GetSearchPostCountDto dto) throws IOException {
+        return Result.success(postService.getSearchPostCount(dto));
+    }
+
+    @PostMapping("/getSearchPostByPage")
+    public Result getSearchPostByPage(@RequestBody GetSearchPostByPageDto dto) throws IOException {
+        return Result.success(postService.getSearchPostByPage(dto));
     }
 }

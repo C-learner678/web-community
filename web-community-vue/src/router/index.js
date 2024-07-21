@@ -6,6 +6,7 @@ import SectionView from '@/views/SectionView.vue'
 import PostView from '@/views/PostView.vue'
 import UserView from '@/views/UserView.vue'
 import PersonalView from '@/views/PersonalView.vue'
+import SearchPostView from '@/views/SearchPostView.vue'
 
 Vue.use(VueRouter)
 
@@ -44,6 +45,11 @@ const routes = [
     path: '/personal',
     name: 'personal',
     component: PersonalView
+  },
+  {
+    path: '/searchPost',
+    name: 'searchPost',
+    component: SearchPostView
   }
 ]
 

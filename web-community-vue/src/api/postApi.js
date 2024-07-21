@@ -79,3 +79,27 @@ export function adminDeletePost(postId){
     }
   })
 }
+
+export function getSearchPostByPage(text, sectionId, pageSize, pageNum){
+  return request({
+    url: '/post/getSearchPostByPage',
+    method: 'POST',
+    data: {
+      text,
+      sectionId, 
+      pageSize, 
+      pageNum
+    }
+  })
+}
+
+export function getSearchPostCount(text, sectionId){
+  return request({
+    url: '/post/getSearchPostCount',
+    method: 'POST',
+    data: {
+      text,
+      sectionId
+    }
+  })
+}

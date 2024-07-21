@@ -72,7 +72,7 @@
               prop="op"
               label="操作"
               width="180"
-              v-if="user.role=='admin'">
+              v-if="user != null && user.role=='admin'">
               <template slot-scope="scope">
                 <el-button @click="clickDeletePost(scope.row)" type="text" size="small">删除</el-button>
               </template>
@@ -229,7 +229,7 @@ export default {
     return {
       user: {},
       sectionId: 0,
-      section: null,
+      section: {},
       topPosts: [],
       posts: [],
       pageSize: 30,

@@ -7,7 +7,7 @@ import com.jlu.webcommunity.entity.Post;
 import com.jlu.webcommunity.entity.dto.comment.AddCommentDto;
 import com.jlu.webcommunity.entity.dto.comment.GetCommentByPageDto;
 import com.jlu.webcommunity.entity.dto.comment.GetCommentCountDto;
-import com.jlu.webcommunity.entity.vo.SelectCommentByPageVo;
+import com.jlu.webcommunity.entity.vo.GetCommentByPageVo;
 import com.jlu.webcommunity.filter.context.UserContext;
 import com.jlu.webcommunity.service.CommentService;
 import com.jlu.webcommunity.util.PageParam;
@@ -28,7 +28,7 @@ public class CommentServiceImpl implements CommentService {
     private CommentDao commentDao;
 
     @Override
-    public List<SelectCommentByPageVo> getCommentByPage(GetCommentByPageDto dto) {
+    public List<GetCommentByPageVo> getCommentByPage(GetCommentByPageDto dto) {
         return commentDao.getBaseMapper().selectCommentByPage(dto.getPostId(), dto.getUserId(),
                 PageParam.getInstance(dto.getPageNum(), dto.getPageSize()));
     }

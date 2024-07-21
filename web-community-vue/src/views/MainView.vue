@@ -13,17 +13,6 @@
           </div>
           <br>
           <div>
-            <el-row>
-              <el-col :span="20">
-                <el-input v-model="searchText" placeholder="搜索帖子"></el-input>
-              </el-col>
-              <el-col :span="4">
-                &nbsp;&nbsp;&nbsp;<el-button type="primary">搜索</el-button>
-              </el-col>
-            </el-row>
-          </div>
-          <br>
-          <div>
             <el-button icon="el-icon-food" size="large" @click="clickSection(1)">闲聊</el-button>
             <el-button icon="el-icon-edit" size="large" @click="clickSection(2)">技术交流</el-button>
           </div>

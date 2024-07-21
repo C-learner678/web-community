@@ -7,7 +7,7 @@
         </if>
     </sql>
 
-    <select id="selectCommentByPage" resultType="com.jlu.webcommunity.entity.vo.SelectCommentByPageVo">
+    <select id="selectCommentByPage" resultType="com.jlu.webcommunity.entity.vo.GetCommentByPageVo">
         select c.id, c.user_id, ui.front_name, ui.avatar, c.post_id, c.content, c.create_time, c.update_time
         from comment c
         inner join user_info ui on c.user_id = ui.user_id

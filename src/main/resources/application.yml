@@ -34,3 +34,23 @@ mybatis-plus:
 image:
   image-path: C:/files/web-community-images/
 
+elasticsearch:
+  # 是否开启ES
+  open: false
+  # es集群名称
+  clusterName: elasticsearch
+  hosts: 127.0.0.1:9200
+  userName: elastic
+  password: 123456
+  # es 请求方式
+  scheme: http
+  # es 连接超时时间
+  connectTimeOut: 1000
+  # es socket 连接超时时间
+  socketTimeOut: 30000
+  # es 请求超时时间
+  connectionRequestTimeOut: 500
+  # es 最大连接数
+  maxConnectNum: 100
+  # es 每个路由的最大连接数
+  maxConnectNumPerRoute: 100

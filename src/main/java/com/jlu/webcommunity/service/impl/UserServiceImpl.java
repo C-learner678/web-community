@@ -70,7 +70,7 @@ public class UserServiceImpl implements UserService {
         }
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("name", loginDto.getName());
-        queryWrapper.eq("password", DigestUtil.md5Hex(loginDto.getPassword()));
+        queryWrapper.eq("password", loginDto.getPassword());
         User user = userDao.getOne(queryWrapper);
         if(user == null){
             result.setStatus(1); //用户名或密码错误
@@ -112,7 +112,7 @@ public class UserServiceImpl implements UserService {
         }
         User user1 = new User();
         user1.setName(registerDto.getName());
-        user1.setPassword(DigestUtil.md5Hex(registerDto.getPassword()));
+        user1.setPassword(registerDto.getPassword());
         user1.setRole("user");
         if(userDao.getBaseMapper().insertUser(user1) > 0){
             UserInfo userInfo = new UserInfo();
@@ -161,10 +161,10 @@ public class UserServiceImpl implements UserService {
     public boolean modifyPassword(ModifyPasswordDto modifyPasswordDto){
         Long userId = UserContext.getUserData().getId();
         User user = userDao.getById(userId);
-        if(!Objects.equals(DigestUtil.md5Hex(modifyPasswordDto.getOldPassword()), user.getPassword())){
+        if(!Objects.equals(modifyPasswordDto.getOldPassword(), user.getPassword())){
             return false;
         }
-        user.setPassword(DigestUtil.md5Hex(modifyPasswordDto.getNewPassword()));
+        user.setPassword(modifyPasswordDto.getNewPassword());
         user.setUpdateTime(new Date());
         userDao.updateById(user);
         return true;

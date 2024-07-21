@@ -7,7 +7,7 @@ import com.jlu.webcommunity.dao.UserInfoDao;
 import com.jlu.webcommunity.entity.UserFollow;
 import com.jlu.webcommunity.entity.UserInfo;
 import com.jlu.webcommunity.entity.dto.userFollow.GetUserFollowByPageDto;
-import com.jlu.webcommunity.entity.vo.SelectUserFollowCountVo;
+import com.jlu.webcommunity.entity.vo.GetUserFollowCountVo;
 import com.jlu.webcommunity.entity.dto.userFollow.GetUserFollowerByPageDto;
 import com.jlu.webcommunity.filter.context.UserContext;
 import com.jlu.webcommunity.service.UserFollowService;
@@ -133,13 +133,13 @@ public class UserFollowServiceImpl implements UserFollowService {
 
     @Override
     public void countUserFollow() {
-        List<SelectUserFollowCountVo> list = userFollowDao.getBaseMapper().selectUserFollowCount();
-        for(SelectUserFollowCountVo dto: list){
+        List<GetUserFollowCountVo> list = userFollowDao.getBaseMapper().selectUserFollowCount();
+        for(GetUserFollowCountVo dto: list){
             redisUtil.hSet(RedisConstant.userStatisticKey + dto.getUserId(),
                     RedisConstant.userFollowNumKey, dto.getCnt());
         }
-        List<SelectUserFollowCountVo> list2 = userFollowDao.getBaseMapper().selectUserFollowerCount();
-        for(SelectUserFollowCountVo dto: list2){
+        List<GetUserFollowCountVo> list2 = userFollowDao.getBaseMapper().selectUserFollowerCount();
+        for(GetUserFollowCountVo dto: list2){
             redisUtil.hSet(RedisConstant.userStatisticKey + dto.getUserId(),
                     RedisConstant.userFollowerNumKey, dto.getCnt());
         }
