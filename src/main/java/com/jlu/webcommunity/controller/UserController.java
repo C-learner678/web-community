@@ -1,15 +1,12 @@
 package com.jlu.webcommunity.controller;
 
-import com.jlu.webcommunity.aop.checkAdmin.CheckAdmin;
-import com.jlu.webcommunity.aop.checkLogin.CheckLogin;
-import com.jlu.webcommunity.entity.dto.user.LoginDto;
-import com.jlu.webcommunity.entity.dto.user.ModifyPasswordDto;
-import com.jlu.webcommunity.entity.dto.user.ModifyUserStatusDto;
-import com.jlu.webcommunity.entity.dto.user.RegisterDto;
+import com.jlu.webcommunity.core.aop.checkAdmin.CheckAdmin;
+import com.jlu.webcommunity.core.aop.checkLogin.CheckLogin;
+import com.jlu.webcommunity.entity.dto.user.*;
 import com.jlu.webcommunity.entity.vo.LoginVo;
 import com.jlu.webcommunity.entity.vo.RegisterVo;
 import com.jlu.webcommunity.enums.StatusCodeEnum;
-import com.jlu.webcommunity.filter.context.UserContext;
+import com.jlu.webcommunity.core.filter.context.UserContext;
 import com.jlu.webcommunity.service.UserService;
 import com.jlu.webcommunity.controller.result.Result;
 import lombok.extern.slf4j.Slf4j;
@@ -99,5 +96,10 @@ public class UserController {
         }else{
             return Result.fail(StatusCodeEnum.MODIFY_USER_STATUS_FAILED);
         }
+    }
+
+    @PostMapping("/getUserBanned")
+    public Result getUserBanned(@RequestBody GetUserBannedDto getUserBannedDto){
+        return Result.success(userService.isUserBanned(getUserBannedDto.getUserId()));
     }
 }

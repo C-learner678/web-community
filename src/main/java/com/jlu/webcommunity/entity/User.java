@@ -15,6 +15,7 @@ public class User {
     private String name;
     private String password;
     private String role;
+    private Boolean banned;
     private Boolean deleted;
     private Date createTime;
     private Date updateTime;

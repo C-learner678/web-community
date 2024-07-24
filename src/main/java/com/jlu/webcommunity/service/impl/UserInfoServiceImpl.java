@@ -5,16 +5,13 @@ import com.jlu.webcommunity.dao.UserInfoDao;
 import com.jlu.webcommunity.entity.UserInfo;
 import com.jlu.webcommunity.entity.dto.userInfo.ModifyAvatarDto;
 import com.jlu.webcommunity.entity.dto.userInfo.ModifyUserInfoDto;
-import com.jlu.webcommunity.filter.context.UserContext;
+import com.jlu.webcommunity.core.filter.context.UserContext;
 import com.jlu.webcommunity.service.UserInfoService;
-import com.jlu.webcommunity.util.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.util.Date;
-import java.util.List;
 
 @Slf4j
 @Service

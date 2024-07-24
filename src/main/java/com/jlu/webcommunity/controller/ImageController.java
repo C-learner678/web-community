@@ -1,7 +1,7 @@
 package com.jlu.webcommunity.controller;
 
-import com.jlu.webcommunity.aop.checkBanned.CheckBanned;
-import com.jlu.webcommunity.aop.checkLogin.CheckLogin;
+import com.jlu.webcommunity.core.aop.checkBanned.CheckBanned;
+import com.jlu.webcommunity.core.aop.checkLogin.CheckLogin;
 import com.jlu.webcommunity.controller.result.Result;
 import com.jlu.webcommunity.enums.StatusCodeEnum;
 import com.jlu.webcommunity.service.ImageService;

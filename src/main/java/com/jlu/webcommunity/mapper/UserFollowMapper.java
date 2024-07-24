@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jlu.webcommunity.entity.UserFollow;
 import com.jlu.webcommunity.entity.UserInfo;
 import com.jlu.webcommunity.entity.vo.GetUserFollowCountVo;
-import com.jlu.webcommunity.util.PageParam;
+import com.jlu.webcommunity.core.PageParam;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;

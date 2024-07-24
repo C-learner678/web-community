@@ -3,9 +3,12 @@ package com.jlu.webcommunity.service.impl;
 import cn.hutool.captcha.CaptchaUtil;
 import cn.hutool.captcha.LineCaptcha;
 import cn.hutool.core.util.RandomUtil;
-import cn.hutool.crypto.digest.DigestUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.jlu.webcommunity.constant.RedisConstant;
+import com.jlu.webcommunity.core.constant.MessageTypeConstant;
+import com.jlu.webcommunity.core.constant.RedisConstant;
+import com.jlu.webcommunity.core.constant.RocketmqConstant;
+import com.jlu.webcommunity.core.rocketmq.RocketmqBody;
+import com.jlu.webcommunity.core.rocketmq.RocketmqProducer;
 import com.jlu.webcommunity.dao.UserInfoDao;
 import com.jlu.webcommunity.entity.UserInfo;
 import com.jlu.webcommunity.entity.dto.user.LoginDto;
@@ -18,10 +21,10 @@ import com.jlu.webcommunity.entity.User;
 import com.jlu.webcommunity.entity.vo.GetCurrentUserVo;
 import com.jlu.webcommunity.entity.vo.LoginVo;
 import com.jlu.webcommunity.entity.vo.RegisterVo;
-import com.jlu.webcommunity.filter.context.UserContext;
+import com.jlu.webcommunity.core.filter.context.UserContext;
 import com.jlu.webcommunity.service.UserService;
-import com.jlu.webcommunity.util.JwtUtil;
-import com.jlu.webcommunity.util.RedisUtil;
+import com.jlu.webcommunity.core.JwtUtil;
+import com.jlu.webcommunity.core.RedisClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,7 +32,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -44,10 +46,13 @@ public class UserServiceImpl implements UserService {
     private UserInfoDao userInfoDao;
 
     @Autowired
-    private RedisUtil redisUtil;
+    private RedisClient redisClient;
 
     @Autowired
     private JwtUtil jwtUtil;
+
+    @Autowired
+    private RocketmqProducer rocketmqProducer;
 
     //登录：本项目管理员和普通用户均可登录。后台项目只允许管理员登录。
     //比较前端传来的验证码值与redis中保存的是否一致
@@ -57,16 +62,16 @@ public class UserServiceImpl implements UserService {
         if(useCaptcha) {
             String key = RedisConstant.captchaKey + loginDto.getCaptchaKey();
             String captcha = loginDto.getCaptcha();
-            if (!redisUtil.hasKey(key)) {
+            if (!redisClient.hasKey(key)) {
                 result.setStatus(2); //验证码过期
                 return result;
             }
-            if (!redisUtil.get(key).equals(captcha)) {
-                redisUtil.del(key);
+            if (!redisClient.get(key).equals(captcha)) {
+                redisClient.del(key);
                 result.setStatus(3); //验证码错误
                 return result;
             }
-            redisUtil.del(key);
+            redisClient.del(key);
         }
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("name", loginDto.getName());
@@ -93,16 +98,16 @@ public class UserServiceImpl implements UserService {
         RegisterVo result = new RegisterVo();
         String key = RedisConstant.captchaKey + registerDto.getCaptchaKey();
         String captcha = registerDto.getCaptcha();
-        if (!redisUtil.hasKey(key)) {
+        if (!redisClient.hasKey(key)) {
             result.setStatus(2); //验证码过期
             return result;
         }
-        if (!redisUtil.get(key).equals(captcha)) {
-            redisUtil.del(key);
+        if (!redisClient.get(key).equals(captcha)) {
+            redisClient.del(key);
             result.setStatus(3); //验证码错误
             return result;
         }
-        redisUtil.del(key);
+        redisClient.del(key);
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("name", registerDto.getName());
         User user = userDao.getOne(queryWrapper);
@@ -121,9 +126,9 @@ public class UserServiceImpl implements UserService {
             userInfo.setFrontName(user1.getName());
             if(userInfoDao.getBaseMapper().insertUserInfo(userInfo) > 0){
                 // 设置用户统计
-                redisUtil.hSet(RedisConstant.userStatisticKey + user1.getId(),
+                redisClient.hSet(RedisConstant.userStatisticKey + user1.getId(),
                         RedisConstant.userFollowNumKey, 0);
-                redisUtil.hSet(RedisConstant.userStatisticKey + user1.getId(),
+                redisClient.hSet(RedisConstant.userStatisticKey + user1.getId(),
                         RedisConstant.userFollowerNumKey, 0);
                 // 注册完成后自动登录
                 String token = jwtUtil.createSession(user1);
@@ -152,7 +157,7 @@ public class UserServiceImpl implements UserService {
         CaptchaVo captchaVO = new CaptchaVo();
         captchaVO.setCaptchaImage(lineCaptcha.getImageBase64());
         captchaVO.setKey(key);
-        redisUtil.set(RedisConstant.captchaKey + key, lineCaptcha.getCode(),120);
+        redisClient.set(RedisConstant.captchaKey + key, lineCaptcha.getCode(),120);
         log.info("验证码：" + lineCaptcha.getCode());
         return captchaVO;
     }
@@ -195,29 +200,37 @@ public class UserServiceImpl implements UserService {
         if(user == null){
             return false;
         }
-        user.setDeleted(modifyUserStatusDto.getBan());
+        user.setBanned(modifyUserStatusDto.getBan());
         userDao.updateById(user);
         if(modifyUserStatusDto.getBan()) {
-            redisUtil.sAdd(RedisConstant.banUsersKey, String.valueOf(modifyUserStatusDto.getUserId()));
+            redisClient.sAdd(RedisConstant.banUsersKey, String.valueOf(modifyUserStatusDto.getUserId()));
+            RocketmqBody body = new RocketmqBody();
+            body.setUserId(modifyUserStatusDto.getUserId());
+            body.setType(MessageTypeConstant.BAN_USER);
+            rocketmqProducer.syncSend(body, RocketmqConstant.topic);
         }else{
-            redisUtil.sRemove(RedisConstant.banUsersKey, String.valueOf(modifyUserStatusDto.getUserId()));
+            redisClient.sRemove(RedisConstant.banUsersKey, String.valueOf(modifyUserStatusDto.getUserId()));
+            RocketmqBody body = new RocketmqBody();
+            body.setUserId(modifyUserStatusDto.getUserId());
+            body.setType(MessageTypeConstant.CANCEL_BAN_USER);
+            rocketmqProducer.syncSend(body, RocketmqConstant.topic);
         }
         return true;
     }
 
     @Override
     public boolean isUserBanned(Long id) {
-        return redisUtil.sIsMember(RedisConstant.banUsersKey, String.valueOf(id));
+        return redisClient.sIsMember(RedisConstant.banUsersKey, String.valueOf(id));
     }
 
     @Override
     public void setAllUserStatus(){
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("deleted", true);
+        queryWrapper.eq("banned", true);
         List<User> userList = userDao.list(queryWrapper);
-        redisUtil.del(RedisConstant.banUsersKey);
+        redisClient.del(RedisConstant.banUsersKey);
         for(User user: userList){
-            redisUtil.sAdd(RedisConstant.banUsersKey, String.valueOf(user.getId()));
+            redisClient.sAdd(RedisConstant.banUsersKey, String.valueOf(user.getId()));
         }
     }
 

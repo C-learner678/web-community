@@ -1,8 +1,8 @@
 package com.jlu.webcommunity.controller;
 
-import com.jlu.webcommunity.aop.checkAdmin.CheckAdmin;
-import com.jlu.webcommunity.aop.checkBanned.CheckBanned;
-import com.jlu.webcommunity.aop.checkLogin.CheckLogin;
+import com.jlu.webcommunity.core.aop.checkAdmin.CheckAdmin;
+import com.jlu.webcommunity.core.aop.checkBanned.CheckBanned;
+import com.jlu.webcommunity.core.aop.checkLogin.CheckLogin;
 import com.jlu.webcommunity.controller.result.Result;
 import com.jlu.webcommunity.entity.dto.comment.AddCommentDto;
 import com.jlu.webcommunity.entity.dto.comment.DeleteCommentDto;

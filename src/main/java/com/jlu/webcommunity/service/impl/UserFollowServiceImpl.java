@@ -1,7 +1,11 @@
 package com.jlu.webcommunity.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.jlu.webcommunity.constant.RedisConstant;
+import com.jlu.webcommunity.core.constant.MessageTypeConstant;
+import com.jlu.webcommunity.core.constant.RedisConstant;
+import com.jlu.webcommunity.core.constant.RocketmqConstant;
+import com.jlu.webcommunity.core.rocketmq.RocketmqBody;
+import com.jlu.webcommunity.core.rocketmq.RocketmqProducer;
 import com.jlu.webcommunity.dao.UserFollowDao;
 import com.jlu.webcommunity.dao.UserInfoDao;
 import com.jlu.webcommunity.entity.UserFollow;
@@ -9,10 +13,10 @@ import com.jlu.webcommunity.entity.UserInfo;
 import com.jlu.webcommunity.entity.dto.userFollow.GetUserFollowByPageDto;
 import com.jlu.webcommunity.entity.vo.GetUserFollowCountVo;
 import com.jlu.webcommunity.entity.dto.userFollow.GetUserFollowerByPageDto;
-import com.jlu.webcommunity.filter.context.UserContext;
+import com.jlu.webcommunity.core.filter.context.UserContext;
 import com.jlu.webcommunity.service.UserFollowService;
-import com.jlu.webcommunity.util.PageParam;
-import com.jlu.webcommunity.util.RedisUtil;
+import com.jlu.webcommunity.core.PageParam;
+import com.jlu.webcommunity.core.RedisClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,7 +35,10 @@ public class UserFollowServiceImpl implements UserFollowService {
     private UserInfoDao userInfoDao;
 
     @Autowired
-    private RedisUtil redisUtil;
+    private RedisClient redisClient;
+
+    @Autowired
+    private RocketmqProducer rocketmqProducer;
 
     @Override
     public boolean isFollow(Long userId, Long followUserId) {
@@ -71,10 +78,16 @@ public class UserFollowServiceImpl implements UserFollowService {
             return false;
         }
         userFollowDao.saveOrUpdate(userFollow);
-        redisUtil.hIncr(RedisConstant.userStatisticKey + followUserId,
+        redisClient.hIncr(RedisConstant.userStatisticKey + followUserId,
                 RedisConstant.userFollowNumKey, 1l);
-        redisUtil.hIncr(RedisConstant.userStatisticKey + userId,
+        redisClient.hIncr(RedisConstant.userStatisticKey + userId,
                 RedisConstant.userFollowerNumKey, 1l);
+        // 发送消息
+        RocketmqBody body = new RocketmqBody();
+        body.setUserId(userId);
+        body.setFromUserId(followUserId);
+        body.setType(MessageTypeConstant.ADD_USER_FOLLOW);
+        rocketmqProducer.syncSend(body, RocketmqConstant.topic);
         return true;
     }
 
@@ -89,9 +102,9 @@ public class UserFollowServiceImpl implements UserFollowService {
             userFollow.setDeleted(true);
             userFollow.setUpdateTime(new Date());
             userFollowDao.saveOrUpdate(userFollow);
-            redisUtil.hIncr(RedisConstant.userStatisticKey + followUserId,
+            redisClient.hIncr(RedisConstant.userStatisticKey + followUserId,
                     RedisConstant.userFollowNumKey, -1l);
-            redisUtil.hIncr(RedisConstant.userStatisticKey + userId,
+            redisClient.hIncr(RedisConstant.userStatisticKey + userId,
                     RedisConstant.userFollowerNumKey, -1l);
             return true;
         }else{
@@ -113,8 +126,8 @@ public class UserFollowServiceImpl implements UserFollowService {
 
     @Override
     public Integer getFollowNum(Long userId) {
-        if(redisUtil.hasKey(RedisConstant.userStatisticKey + userId)){
-            return (Integer) redisUtil.hGet(RedisConstant.userStatisticKey + userId,
+        if(redisClient.hasKey(RedisConstant.userStatisticKey + userId)){
+            return (Integer) redisClient.hGet(RedisConstant.userStatisticKey + userId,
                     RedisConstant.userFollowNumKey);
         }else{
             return 0;
@@ -123,8 +136,8 @@ public class UserFollowServiceImpl implements UserFollowService {
 
     @Override
     public Integer getFollowerNum(Long userId) {
-        if(redisUtil.hasKey(RedisConstant.userStatisticKey + userId)){
-            return (Integer) redisUtil.hGet(RedisConstant.userStatisticKey + userId,
+        if(redisClient.hasKey(RedisConstant.userStatisticKey + userId)){
+            return (Integer) redisClient.hGet(RedisConstant.userStatisticKey + userId,
                     RedisConstant.userFollowerNumKey);
         }else{
             return 0;
@@ -135,12 +148,12 @@ public class UserFollowServiceImpl implements UserFollowService {
     public void countUserFollow() {
         List<GetUserFollowCountVo> list = userFollowDao.getBaseMapper().selectUserFollowCount();
         for(GetUserFollowCountVo dto: list){
-            redisUtil.hSet(RedisConstant.userStatisticKey + dto.getUserId(),
+            redisClient.hSet(RedisConstant.userStatisticKey + dto.getUserId(),
                     RedisConstant.userFollowNumKey, dto.getCnt());
         }
         List<GetUserFollowCountVo> list2 = userFollowDao.getBaseMapper().selectUserFollowerCount();
         for(GetUserFollowCountVo dto: list2){
-            redisUtil.hSet(RedisConstant.userStatisticKey + dto.getUserId(),
+            redisClient.hSet(RedisConstant.userStatisticKey + dto.getUserId(),
                     RedisConstant.userFollowerNumKey, dto.getCnt());
         }
     }

@@ -15,9 +15,7 @@ public class Post implements Serializable {
     private static final long serialVersionUID = 1L;
     @TableId(type = IdType.AUTO)
     private Long id;
-    @TableField("section_id")
     private Long sectionId;
-    @TableField("user_id")
     private Long userId;
     private String title;
     private String content;

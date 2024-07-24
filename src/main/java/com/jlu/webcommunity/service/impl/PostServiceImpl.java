@@ -1,17 +1,20 @@
 package com.jlu.webcommunity.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
-import com.jlu.webcommunity.config.ElasticsearchConfig;
-import com.jlu.webcommunity.constant.RedisConstant;
+import com.jlu.webcommunity.core.constant.MessageTypeConstant;
+import com.jlu.webcommunity.core.constant.RedisConstant;
+import com.jlu.webcommunity.core.constant.RocketmqConstant;
+import com.jlu.webcommunity.core.rocketmq.RocketmqBody;
+import com.jlu.webcommunity.core.rocketmq.RocketmqProducer;
 import com.jlu.webcommunity.dao.PostDao;
 import com.jlu.webcommunity.dao.SectionDao;
 import com.jlu.webcommunity.entity.Post;
 import com.jlu.webcommunity.entity.dto.post.*;
 import com.jlu.webcommunity.entity.vo.GetPostByPageVo;
-import com.jlu.webcommunity.filter.context.UserContext;
+import com.jlu.webcommunity.core.filter.context.UserContext;
 import com.jlu.webcommunity.service.PostService;
-import com.jlu.webcommunity.util.PageParam;
-import com.jlu.webcommunity.util.RedisUtil;
+import com.jlu.webcommunity.core.PageParam;
+import com.jlu.webcommunity.core.RedisClient;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -45,10 +48,13 @@ public class PostServiceImpl implements PostService {
     private SectionDao sectionDao;
 
     @Autowired
-    private RedisUtil redisUtil;
+    private RedisClient redisClient;
 
     @Autowired
     private RestHighLevelClient restHighLevelClient;
+
+    @Autowired
+    private RocketmqProducer rocketmqProducer;
 
     @Value("${elasticsearch.open}")
     private Boolean openES;
@@ -57,22 +63,22 @@ public class PostServiceImpl implements PostService {
     public Post getPost(Long id) {
         Post post = getPostWithLock(id);
         if(post == null || post.getDeleted()){
-            redisUtil.set(RedisConstant.postContentKey + id, null, 1800);
+            redisClient.set(RedisConstant.postContentKey + id, null, 1800);
             return null;
         }
-        redisUtil.set(RedisConstant.postContentKey + id, post, 1800);
+        redisClient.set(RedisConstant.postContentKey + id, post, 1800);
         return post;
     }
 
     // 加锁获取数据库中的文章内容，减少数据库访问量
     private Post getPostWithLock(Long postId){
-        if(redisUtil.hasKey(RedisConstant.postContentKey + postId)){
-            return (Post) redisUtil.get(RedisConstant.postContentKey + postId);
+        if(redisClient.hasKey(RedisConstant.postContentKey + postId)){
+            return (Post) redisClient.get(RedisConstant.postContentKey + postId);
         }
         String key = RedisConstant.postLockKey + postId;
         String value = RandomUtil.randomString(6); // 每个线程设置自身的value，防止删掉其他线程设置的锁
         // 上锁
-        Boolean isLockSuccess = redisUtil.setIfAbsent(key, value, 60);
+        Boolean isLockSuccess = redisClient.setIfAbsent(key, value, 60);
         Post post = null;
         try {
             if (isLockSuccess) {
@@ -91,7 +97,7 @@ public class PostServiceImpl implements PostService {
                     redisUtil.del(key);
                 }
             */
-            redisUtil.delByLua(key, value); // Lua脚本实现原子化
+            redisClient.delByLua(key, value); // Lua脚本实现原子化
         }
         return post;
     }
@@ -130,7 +136,7 @@ public class PostServiceImpl implements PostService {
         post.setContent(modifyPostDto.getContent());
         post.setUpdateTime(new Date());
         postDao.updateById(post);
-        redisUtil.del(RedisConstant.postContentKey + post.getId());
+        redisClient.del(RedisConstant.postContentKey + post.getId());
         return true;
     }
 
@@ -146,7 +152,7 @@ public class PostServiceImpl implements PostService {
         post.setDeleted(true);
         post.setUpdateTime(new Date());
         postDao.updateById(post);
-        redisUtil.del(RedisConstant.postContentKey + post.getId());
+        redisClient.del(RedisConstant.postContentKey + post.getId());
         return true;
     }
 
@@ -184,6 +190,11 @@ public class PostServiceImpl implements PostService {
             post.setDeleted(true);
             post.setUpdateTime(new Date());
             postDao.updateById(post);
+            RocketmqBody body = new RocketmqBody();
+            body.setUserId(post.getUserId());
+            body.setRelateId(post.getId());
+            body.setType(MessageTypeConstant.DELETE_POST);
+            rocketmqProducer.syncSend(body, RocketmqConstant.topic);
             return true;
         }
         return false;

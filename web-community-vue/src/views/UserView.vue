@@ -35,7 +35,7 @@
           <el-button v-if="isCurrentUserFollow==true" size="small" type="primary" @click="clickRemoveFollow">
             取消关注
           </el-button>&nbsp;&nbsp;
-          <el-switch v-if="currentUser != null && currentUser.role=='admin'" v-model="user.deleted" active-text="封禁" @change="clickBan">
+          <el-switch v-if="currentUser != null && currentUser.role=='admin'" v-model="banned" active-text="封禁" @change="clickBan">
           </el-switch>
           <br>
           <div style="font-weight: bold">
@@ -104,7 +104,7 @@
 
 <script>
 import BASE_URL from '@/request/baseUrl'
-import { getCurrentUser, getUserInfo, modifyUserStatus } from '@/api/userApi'
+import { getCurrentUser, getUserInfo, modifyUserStatus, getUserBanned } from '@/api/userApi'
 import { getPostByPage, getPostCount, adminDeletePost } from '@/api/postApi'
 import { getFollowNum, getFollowerNum, isFollow, addFollow, removeFollow } from '@/api/userFollowApi'
 import UserFollowList from '@/components/UserFollowList.vue'
@@ -208,7 +208,8 @@ export default {
       total: 0,
       isCurrentUserFollow: false, // 当前用户已关注该用户
       isCurrentUserFollower: false, // 当前用户被该用户关注
-      imageUrl: ''
+      imageUrl: '',
+      banned: false
     }
   },
   created() {
@@ -265,6 +266,11 @@ export default {
         this.posts[i].createTime = new Date(this.posts[i].createTime).toLocaleString()
         this.posts[i].updateTime = new Date(this.posts[i].updateTime).toLocaleString()
       }
+    }).catch((error) => {
+    })
+    getUserBanned(this.userId)
+    .then((res) => {
+      this.banned = res.result
     }).catch((error) => {
     })
   }

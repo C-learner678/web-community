@@ -3,7 +3,7 @@ package com.jlu.webcommunity.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jlu.webcommunity.entity.Post;
 import com.jlu.webcommunity.entity.vo.GetPostByPageVo;
-import com.jlu.webcommunity.util.PageParam;
+import com.jlu.webcommunity.core.PageParam;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;

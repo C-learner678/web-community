@@ -1,5 +1,9 @@
 package com.jlu.webcommunity.service.impl;
 
+import com.jlu.webcommunity.core.constant.MessageTypeConstant;
+import com.jlu.webcommunity.core.constant.RocketmqConstant;
+import com.jlu.webcommunity.core.rocketmq.RocketmqBody;
+import com.jlu.webcommunity.core.rocketmq.RocketmqProducer;
 import com.jlu.webcommunity.dao.CommentDao;
 import com.jlu.webcommunity.dao.PostDao;
 import com.jlu.webcommunity.entity.Comment;
@@ -8,9 +12,9 @@ import com.jlu.webcommunity.entity.dto.comment.AddCommentDto;
 import com.jlu.webcommunity.entity.dto.comment.GetCommentByPageDto;
 import com.jlu.webcommunity.entity.dto.comment.GetCommentCountDto;
 import com.jlu.webcommunity.entity.vo.GetCommentByPageVo;
-import com.jlu.webcommunity.filter.context.UserContext;
+import com.jlu.webcommunity.core.filter.context.UserContext;
 import com.jlu.webcommunity.service.CommentService;
-import com.jlu.webcommunity.util.PageParam;
+import com.jlu.webcommunity.core.PageParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,6 +30,9 @@ public class CommentServiceImpl implements CommentService {
 
     @Autowired
     private CommentDao commentDao;
+
+    @Autowired
+    private RocketmqProducer rocketmqProducer;
 
     @Override
     public List<GetCommentByPageVo> getCommentByPage(GetCommentByPageDto dto) {
@@ -52,6 +59,12 @@ public class CommentServiceImpl implements CommentService {
         comment.setCreateTime(new Date());
         comment.setUpdateTime(new Date());
         commentDao.save(comment);
+        RocketmqBody body = new RocketmqBody();
+        body.setFromUserId(UserContext.getUserData().getId());
+        body.setRelateId(dto.getPostId());
+        body.setType(MessageTypeConstant.ADD_COMMENT);
+        body.setMessage(dto.getContent());
+        rocketmqProducer.syncSend(body, RocketmqConstant.topic);
         return true;
     }
 
@@ -62,6 +75,11 @@ public class CommentServiceImpl implements CommentService {
             comment.setDeleted(true);
             comment.setUpdateTime(new Date());
             commentDao.updateById(comment);
+            RocketmqBody body = new RocketmqBody();
+            body.setUserId(comment.getUserId());
+            body.setRelateId(comment.getId());
+            body.setType(MessageTypeConstant.DELETE_COMMENT);
+            rocketmqProducer.syncSend(body, RocketmqConstant.topic);
             return true;
         }else{
             return false;

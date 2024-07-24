@@ -99,3 +99,13 @@ export function modifyUserStatus(userId, ban){
     }
   })  
 }
+
+export function getUserBanned(userId) {
+  return request({
+    url: '/user/getUserBanned',
+    method: 'POST',
+    data: {
+      userId
+    }
+  })
+}
