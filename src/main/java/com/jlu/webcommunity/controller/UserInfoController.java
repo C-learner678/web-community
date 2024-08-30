@@ -1,7 +1,7 @@
 package com.jlu.webcommunity.controller;
 
 import com.jlu.webcommunity.core.aop.checkLogin.CheckLogin;
-import com.jlu.webcommunity.controller.result.Result;
+import com.jlu.webcommunity.core.result.Result;
 import com.jlu.webcommunity.entity.UserInfo;
 import com.jlu.webcommunity.entity.dto.userInfo.GetUserInfoDto;
 import com.jlu.webcommunity.entity.dto.userInfo.ModifyAvatarDto;

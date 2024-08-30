@@ -1,4 +1,4 @@
-package com.jlu.webcommunity.controller.result;
+package com.jlu.webcommunity.core.result;
 
 import com.jlu.webcommunity.enums.StatusCodeEnum;
 import lombok.Data;

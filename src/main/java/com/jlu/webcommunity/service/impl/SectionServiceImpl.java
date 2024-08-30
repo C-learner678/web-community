@@ -1,7 +1,7 @@
 package com.jlu.webcommunity.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.jlu.webcommunity.core.constant.RedisConstant;
+import com.jlu.webcommunity.constant.RedisConstant;
 import com.jlu.webcommunity.dao.SectionDao;
 import com.jlu.webcommunity.entity.Section;
 import com.jlu.webcommunity.service.SectionService;

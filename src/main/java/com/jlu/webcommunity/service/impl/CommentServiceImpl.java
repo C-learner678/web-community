@@ -1,7 +1,7 @@
 package com.jlu.webcommunity.service.impl;
 
-import com.jlu.webcommunity.core.constant.MessageTypeConstant;
-import com.jlu.webcommunity.core.constant.RocketmqConstant;
+import com.jlu.webcommunity.constant.MessageTypeConstant;
+import com.jlu.webcommunity.constant.RocketmqConstant;
 import com.jlu.webcommunity.core.rocketmq.RocketmqBody;
 import com.jlu.webcommunity.core.rocketmq.RocketmqProducer;
 import com.jlu.webcommunity.dao.CommentDao;

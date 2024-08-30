@@ -1,6 +1,6 @@
 package com.jlu.webcommunity.service.impl;
 
-import com.jlu.webcommunity.core.constant.MessageTypeConstant;
+import com.jlu.webcommunity.constant.MessageTypeConstant;
 import com.jlu.webcommunity.dao.CommentDao;
 import com.jlu.webcommunity.dao.NotifyMessageDao;
 import com.jlu.webcommunity.dao.PostDao;

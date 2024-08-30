@@ -1,7 +1,7 @@
 package com.jlu.webcommunity.core.ehandler;
 
 import com.jlu.webcommunity.enums.StatusCodeEnum;
-import com.jlu.webcommunity.controller.result.Result;
+import com.jlu.webcommunity.core.result.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;

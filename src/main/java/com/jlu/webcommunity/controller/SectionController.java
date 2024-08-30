@@ -3,7 +3,7 @@ package com.jlu.webcommunity.controller;
 import com.jlu.webcommunity.entity.Section;
 import com.jlu.webcommunity.entity.dto.section.GetSectionDto;
 import com.jlu.webcommunity.enums.StatusCodeEnum;
-import com.jlu.webcommunity.controller.result.Result;
+import com.jlu.webcommunity.core.result.Result;
 import com.jlu.webcommunity.service.SectionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

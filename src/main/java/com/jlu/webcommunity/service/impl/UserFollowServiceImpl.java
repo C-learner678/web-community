@@ -1,9 +1,9 @@
 package com.jlu.webcommunity.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.jlu.webcommunity.core.constant.MessageTypeConstant;
-import com.jlu.webcommunity.core.constant.RedisConstant;
-import com.jlu.webcommunity.core.constant.RocketmqConstant;
+import com.jlu.webcommunity.constant.MessageTypeConstant;
+import com.jlu.webcommunity.constant.RedisConstant;
+import com.jlu.webcommunity.constant.RocketmqConstant;
 import com.jlu.webcommunity.core.rocketmq.RocketmqBody;
 import com.jlu.webcommunity.core.rocketmq.RocketmqProducer;
 import com.jlu.webcommunity.dao.UserFollowDao;
@@ -56,7 +56,9 @@ public class UserFollowServiceImpl implements UserFollowService {
         if(followUserId.equals(userId)){ // 不能自己关注自己
             return false;
         }
-        UserInfo userInfo = userInfoDao.getById(userId);
+        QueryWrapper<UserInfo> userInfoQueryWrapper = new QueryWrapper<>();
+        userInfoQueryWrapper.eq("user_id", userId);
+        UserInfo userInfo = userInfoDao.getOne(userInfoQueryWrapper);
         if(userInfo == null || userInfo.getDeleted()){ // 不能关注不存在的用户
             return false;
         }
@@ -103,9 +105,9 @@ public class UserFollowServiceImpl implements UserFollowService {
             userFollow.setUpdateTime(new Date());
             userFollowDao.saveOrUpdate(userFollow);
             redisClient.hIncr(RedisConstant.userStatisticKey + followUserId,
-                    RedisConstant.userFollowNumKey, -1l);
+                    RedisConstant.userFollowNumKey, -1L);
             redisClient.hIncr(RedisConstant.userStatisticKey + userId,
-                    RedisConstant.userFollowerNumKey, -1l);
+                    RedisConstant.userFollowerNumKey, -1L);
             return true;
         }else{
             return false;

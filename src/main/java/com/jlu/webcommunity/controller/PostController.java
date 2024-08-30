@@ -7,7 +7,7 @@ import com.jlu.webcommunity.entity.Post;
 import com.jlu.webcommunity.entity.dto.post.*;
 import com.jlu.webcommunity.entity.vo.GetPostByPageVo;
 import com.jlu.webcommunity.enums.StatusCodeEnum;
-import com.jlu.webcommunity.controller.result.Result;
+import com.jlu.webcommunity.core.result.Result;
 import com.jlu.webcommunity.service.PostService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

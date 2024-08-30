@@ -1,7 +1,7 @@
 package com.jlu.webcommunity.core.rocketmq;
 
-import com.jlu.webcommunity.core.constant.MessageTypeConstant;
-import com.jlu.webcommunity.core.constant.RocketmqConstant;
+import com.jlu.webcommunity.constant.MessageTypeConstant;
+import com.jlu.webcommunity.constant.RocketmqConstant;
 import com.jlu.webcommunity.service.NotifyMessageService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;

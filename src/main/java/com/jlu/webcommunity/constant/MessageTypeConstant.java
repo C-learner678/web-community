@@ -1,4 +1,4 @@
-package com.jlu.webcommunity.core.constant;
+package com.jlu.webcommunity.constant;
 
 public class MessageTypeConstant {
     public final static Integer ADD_USER_FOLLOW = 1;

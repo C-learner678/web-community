@@ -1,4 +1,4 @@
-package com.jlu.webcommunity.core.constant;
+package com.jlu.webcommunity.constant;
 
 public class RocketmqConstant {
     public final static String topic = "TOPIC";

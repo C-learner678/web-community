@@ -1,20 +1,23 @@
 package com.jlu.webcommunity.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
-import com.jlu.webcommunity.core.constant.MessageTypeConstant;
-import com.jlu.webcommunity.core.constant.RedisConstant;
-import com.jlu.webcommunity.core.constant.RocketmqConstant;
+import com.jlu.webcommunity.constant.MessageTypeConstant;
+import com.jlu.webcommunity.constant.RedisConstant;
+import com.jlu.webcommunity.constant.RocketmqConstant;
 import com.jlu.webcommunity.core.rocketmq.RocketmqBody;
 import com.jlu.webcommunity.core.rocketmq.RocketmqProducer;
 import com.jlu.webcommunity.dao.PostDao;
 import com.jlu.webcommunity.dao.SectionDao;
 import com.jlu.webcommunity.entity.Post;
 import com.jlu.webcommunity.entity.dto.post.*;
+import com.jlu.webcommunity.entity.dto.userFoot.ModifyPostUserFootDto;
 import com.jlu.webcommunity.entity.vo.GetPostByPageVo;
 import com.jlu.webcommunity.core.filter.context.UserContext;
+import com.jlu.webcommunity.enums.UserFootTypeEnum;
 import com.jlu.webcommunity.service.PostService;
 import com.jlu.webcommunity.core.PageParam;
 import com.jlu.webcommunity.core.RedisClient;
+import com.jlu.webcommunity.service.UserFootService;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -48,6 +51,9 @@ public class PostServiceImpl implements PostService {
     private SectionDao sectionDao;
 
     @Autowired
+    private UserFootService userFootService;
+
+    @Autowired
     private RedisClient redisClient;
 
     @Autowired
@@ -59,6 +65,25 @@ public class PostServiceImpl implements PostService {
     @Value("${elasticsearch.open}")
     private Boolean openES;
 
+    @Override
+    public Post getPost(Long id) {
+        Post post = postDao.getById(id);
+        if(post == null || post.getDeleted()){
+            return null;
+        }
+        // 如果已登录，则设置已读状态
+        if(UserContext.getUserData() != null && UserContext.getUserData().getId() != null
+                && UserContext.getUserData().getId() > 0L){
+            ModifyPostUserFootDto dto = new ModifyPostUserFootDto();
+            dto.setPositive(true);
+            dto.setType(UserFootTypeEnum.READ);
+            dto.setPostId(id);
+            userFootService.modifyPostUserFoot1(dto);
+        }
+        return post;
+    }
+
+    /*
     @Override
     public Post getPost(Long id) {
         Post post = getPostWithLock(id);
@@ -90,17 +115,16 @@ public class PostServiceImpl implements PostService {
         } catch (InterruptedException e) {
             log.error(e.toString());
         } finally {
-            /*
-                String lockValue = (String) redisUtil.get(key);
-                if (lockValue != null && lockValue.equals(value)) {
-                    // 解锁
-                    redisUtil.del(key);
-                }
-            */
+            //String lockValue = (String) redisUtil.get(key);
+            //if (lockValue != null && lockValue.equals(value)) {
+                // 解锁
+                //redisUtil.del(key);
+            //}
             redisClient.delByLua(key, value); // Lua脚本实现原子化
         }
         return post;
     }
+    */
 
     @Override
     public Long addPost(AddPostDto addPostDto) {

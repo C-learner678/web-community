@@ -5,7 +5,7 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.jlu.webcommunity.core.constant.RedisConstant;
+import com.jlu.webcommunity.constant.RedisConstant;
 import com.jlu.webcommunity.entity.User;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;

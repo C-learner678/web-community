@@ -1,4 +1,4 @@
-package com.jlu.webcommunity.core.constant;
+package com.jlu.webcommunity.constant;
 
 public class RedisConstant {
     public final static String captchaKey = "CAPTCHA_KEY";
@@ -11,4 +11,8 @@ public class RedisConstant {
     public final static String sectionsKey = "SECTIONS_KEY";
     public final static String sectionKey = "SECTION_KEY";
     public final static String banUsersKey = "BAN_USERS_KEY";
+    public final static String postStatisticKey = "POST_STATISTIC_KEY";
+    public final static String postReadNumKey = "POST_READ_NUM_KEY";
+    public final static String postLikeNumKey = "POST_LIKE_NUM_KEY";
+    public final static String postCollectNumKey = "POST_COLLECT_NUM_KEY";
 }
