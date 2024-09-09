@@ -135,7 +135,6 @@
                 <version>${spring-boot.version}</version>
                 <configuration>
                     <mainClass>com.jlu.webcommunity.WebCommunityApplication</mainClass>
-                    <skip>true</skip>
                 </configuration>
                 <executions>
                     <execution>

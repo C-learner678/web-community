@@ -36,3 +36,7 @@ build/
 logs/
 
 start.txt
+upload.txt
+application.yml
+application-dev.yml
+application-prod.yml
