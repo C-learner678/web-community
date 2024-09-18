@@ -35,7 +35,7 @@
         <include refid="limit"/>
     </select>
 
-    <select id="selectUserFollowCount" resultType="com.jlu.webcommunity.entity.vo.GetUserFollowCountVo">
+    <select id="selectUserFollowCount" resultType="com.jlu.webcommunity.entity.vo.userFollow.GetUserFollowCountVo">
         select ui2.user_id userId, if(c is not null, c, 0) cnt
         from user_info ui2
         left join
@@ -50,7 +50,7 @@
         group by ui2.user_id
     </select>
 
-    <select id="selectUserFollowerCount" resultType="com.jlu.webcommunity.entity.vo.GetUserFollowCountVo">
+    <select id="selectUserFollowerCount" resultType="com.jlu.webcommunity.entity.vo.userFollow.GetUserFollowCountVo">
         select ui2.user_id userId, if(c is not null, c, 0) cnt
         from user_info ui2
         left join

@@ -23,7 +23,8 @@ export default {
   props: ["user"],
   methods: {
     clickBack(){
-      this.$router.push("/main")
+      this.$router.push("/main").catch((error) => {
+      })
     },
     clickPersonal(){
       this.$router.push("/personal")

@@ -13,9 +13,30 @@
           </el-image><br>
           作者：<a :href="authorUrl">{{ author.frontName }}</a>&nbsp;&nbsp;&nbsp;
           所属板块：<a :href="sectionUrl">{{ section.name }}</a>&nbsp;&nbsp;&nbsp;
+          已读：{{ userFootCount.readCnt }}&nbsp;&nbsp;&nbsp;
           <el-button type="text" @click="clickDeletePost"
             v-if="user != null && (user.role == 'admin' || user.userId == post.userId)">删除</el-button><br>
           <v-md-preview :text="post.content"></v-md-preview>
+        </div>
+        <div>
+          <el-row>
+            <el-col :span="2">
+              <div v-if="userFoot.likeStatus == true">
+                <el-button type="primary" size="small" @click="cancelLikePost()">已点赞：{{ userFootCount.likeCnt }}</el-button>
+              </div>
+              <div v-else>
+                <el-button type="primary" size="small" @click="likePost()">点赞：{{ userFootCount.likeCnt }}</el-button>
+              </div>
+            </el-col>
+            <el-col :span="2">
+              <div v-if="userFoot.collectStatus == true">
+                <el-button type="primary" size="small" @click="cancelCollectPost()">已收藏</el-button>
+              </div>
+              <div v-else>
+                <el-button type="primary" size="small" @click="collectPost()">收藏</el-button>
+              </div>
+            </el-col>
+          </el-row>
         </div>
         <div>
           <br>评论：<br>
@@ -51,7 +72,7 @@
             <el-table-column
               prop="op"
               label="操作"
-              width="180"
+              width="120"
               v-if="user != null && user.role=='admin'">
               <template slot-scope="scope">
                 <el-button @click="clickDeleteComment(scope.row)" type="text" size="small">删除</el-button>
@@ -87,6 +108,7 @@ import { getPost, deletePost, adminDeletePost } from '@/api/postApi'
 import { getCommentByPage, getCommentCount, addComment, deleteComment } from '@/api/commentApi'
 import { getCurrentUser, getUserInfo } from '@/api/userApi'
 import { getSection } from '@/api/sectionApi'
+import { getPostUserFoot, getPostUserFootCount, modifyPostUserFoot } from '@/api/userFootApi'
 import TopTab from '@/components/TopTab.vue'
 import OriginalAvatar from '@/components/OriginalAvatar.vue'
 
@@ -173,6 +195,54 @@ export default {
       }).catch(() => { 
       });
     },
+    //喜欢帖子
+    likePost(){
+      modifyPostUserFoot(this.postId, 1, true)
+      .then((res) => {
+        getPostUserFoot(this.postId, this.user.userId)
+        .then((res) => {
+          this.userFoot = res.result
+          this.userFootCount.likeCnt += 1;
+        }).catch((error) => {
+        })
+      }).catch((error) => {
+      })
+    },
+    cancelLikePost(){
+      modifyPostUserFoot(this.postId, 1, false)
+      .then((res) => {
+        getPostUserFoot(this.postId, this.user.userId)
+        .then((res) => {
+          this.userFoot = res.result
+          this.userFootCount.likeCnt -= 1;
+        }).catch((error) => {
+        })
+      }).catch((error) => {
+      })
+    },
+    // 收藏帖子
+    collectPost(){
+      modifyPostUserFoot(this.postId, 2, true)
+      .then((res) => {
+        getPostUserFoot(this.postId, this.user.userId)
+        .then((res) => {
+          this.userFoot = res.result
+        }).catch((error) => {
+        })
+      }).catch((error) => {
+      })
+    },
+    cancelCollectPost(){
+      modifyPostUserFoot(this.postId, 2, false)
+      .then((res) => {
+        getPostUserFoot(this.postId, this.user.userId)
+        .then((res) => {
+          this.userFoot = res.result
+        }).catch((error) => {
+        })
+      }).catch((error) => {
+      })
+    }
   },
   data() {
     return {
@@ -191,6 +261,16 @@ export default {
         content: ''
       },
       authorImageUrl: '',
+      userFoot:{
+        readStatus: false,
+        likeStatus: false,
+        collectStatus: false,
+      },
+      userFootCount: {
+        readCnt: 0,
+        likeCnt: 0,
+        collectCnt: 0
+      }
     }
   },
   created() {
@@ -199,6 +279,12 @@ export default {
     getCurrentUser()
     .then((res) => {
       this.user = res.result
+      // 获取用户足迹
+      getPostUserFoot(this.postId, this.user.userId)
+      .then((res) => {
+        this.userFoot = res.result
+      }).catch((error) => {
+      })
     }).catch((error) => {
     })
     // 获取帖子内容
@@ -240,6 +326,11 @@ export default {
           this.comments[i].imageUrl = BASE_URL + 'image/getImage/' + this.comments[i].avatar
         }
       }
+    }).catch((error) => {
+    })
+    getPostUserFootCount(this.postId)
+    .then((res) => {
+      this.userFootCount = res.result
     }).catch((error) => {
     })
   }

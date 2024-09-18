@@ -5,7 +5,7 @@ import com.jlu.webcommunity.core.aop.checkBanned.CheckBanned;
 import com.jlu.webcommunity.core.aop.checkLogin.CheckLogin;
 import com.jlu.webcommunity.entity.Post;
 import com.jlu.webcommunity.entity.dto.post.*;
-import com.jlu.webcommunity.entity.vo.GetPostByPageVo;
+import com.jlu.webcommunity.entity.vo.post.GetPostByPageVo;
 import com.jlu.webcommunity.enums.StatusCodeEnum;
 import com.jlu.webcommunity.core.result.Result;
 import com.jlu.webcommunity.service.PostService;

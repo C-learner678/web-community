@@ -4,9 +4,9 @@ import lombok.Getter;
 
 @Getter
 public enum UserFootTypeEnum {
-    READ(1),
-    LIKE(2),
-    COLLECT(3);
+    READ(0),
+    LIKE(1),
+    COLLECT(2);
 
     private final int type;
     UserFootTypeEnum(int type){

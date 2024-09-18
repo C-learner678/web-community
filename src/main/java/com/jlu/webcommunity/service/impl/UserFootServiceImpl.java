@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jlu.webcommunity.constant.MessageTypeConstant;
 import com.jlu.webcommunity.constant.RedisConstant;
 import com.jlu.webcommunity.constant.RocketmqConstant;
+import com.jlu.webcommunity.core.PageParam;
 import com.jlu.webcommunity.core.RedisClient;
 import com.jlu.webcommunity.core.filter.context.UserContext;
 import com.jlu.webcommunity.core.rocketmq.RocketmqBody;
@@ -12,15 +13,22 @@ import com.jlu.webcommunity.dao.PostDao;
 import com.jlu.webcommunity.dao.UserFootDao;
 import com.jlu.webcommunity.entity.Post;
 import com.jlu.webcommunity.entity.UserFoot;
+import com.jlu.webcommunity.entity.dto.post.GetPostByPageDto;
+import com.jlu.webcommunity.entity.dto.userFoot.GetCollectPostByPageDto;
+import com.jlu.webcommunity.entity.dto.userFoot.GetPostUserFootCountDto;
 import com.jlu.webcommunity.entity.dto.userFoot.GetPostUserFootDto;
 import com.jlu.webcommunity.entity.dto.userFoot.ModifyPostUserFootDto;
-import com.jlu.webcommunity.entity.vo.GetPostUserFootVo;
+import com.jlu.webcommunity.entity.vo.post.GetPostByPageVo;
+import com.jlu.webcommunity.entity.vo.userFoot.GetPostUserFootCountVo;
+import com.jlu.webcommunity.entity.vo.userFoot.GetPostUserFootVo;
 import com.jlu.webcommunity.enums.UserFootTypeEnum;
 import com.jlu.webcommunity.service.UserFootService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class UserFootServiceImpl implements UserFootService {
@@ -145,5 +153,45 @@ public class UserFootServiceImpl implements UserFootService {
             body.setType(MessageTypeConstant.ADD_LIKE_POST);
             rocketmqProducer.syncSend(body, RocketmqConstant.topic);
         }
+    }
+
+    @Override
+    public GetPostUserFootCountVo getPostUserFootCount(GetPostUserFootCountDto dto) {
+        GetPostUserFootCountVo vo = new GetPostUserFootCountVo();
+        vo.setReadCnt((Integer) redisClient.hGet(RedisConstant.postStatisticKey + dto.getPostId(),
+                RedisConstant.postReadNumKey));
+        vo.setLikeCnt((Integer) redisClient.hGet(RedisConstant.postStatisticKey + dto.getPostId(),
+                RedisConstant.postLikeNumKey));
+        vo.setCollectCnt((Integer) redisClient.hGet(RedisConstant.postStatisticKey + dto.getPostId(),
+                RedisConstant.postCollectNumKey));
+        return vo;
+    }
+
+    @Override
+    public List<GetPostByPageVo> getCollectPostByPage(GetCollectPostByPageDto dto) {
+        List<GetPostByPageVo> posts = userFootDao.getBaseMapper().selectCollectPostByPage(
+                UserContext.getUserData().getId(),
+                PageParam.getInstance(dto.getPageNum(), dto.getPageSize()));
+        return posts;
+    }
+
+
+    // 统计每个帖子的已读、喜欢、收藏情况
+    @Override
+    public void countUserFoot(){
+        List<GetPostUserFootCountVo> list = userFootDao.getBaseMapper().selectPostFootCount();
+        for(GetPostUserFootCountVo vo: list){
+            redisClient.hSet(RedisConstant.postStatisticKey + vo.getPostId(),
+                    RedisConstant.postReadNumKey, vo.getReadCnt());
+            redisClient.hSet(RedisConstant.postStatisticKey + vo.getPostId(),
+                    RedisConstant.postLikeNumKey, vo.getLikeCnt());
+            redisClient.hSet(RedisConstant.postStatisticKey + vo.getPostId(),
+                    RedisConstant.postCollectNumKey, vo.getCollectCnt());
+        }
+    }
+
+    @PostConstruct
+    public void init(){
+        this.countUserFoot();
     }
 }

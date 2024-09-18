@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jlu.webcommunity.mapper.UserFootMapper">
+    <sql id="limit">
+        <if test="pageParam != null">
+            limit #{pageParam.offset}, #{pageParam.limit}
+        </if>
+    </sql>
+
+    <select id="selectCollectPostByPage" resultType="com.jlu.webcommunity.entity.vo.post.GetPostByPageVo">
+        select p.id, p.user_id, ui.front_name as userFrontName, p.section_id, s.name as sectionName, p.title, p.create_time, p.update_time
+        from user_foot uf
+        inner join post p on uf.post_id = p.id
+        inner join user_info ui on p.user_id = ui.user_id
+        inner join section s on p.section_id = s.id
+        where
+        p.deleted = 0
+        and uf.deleted = 0
+        and uf.is_post = 1
+        and uf.collect_status = 1
+        <if test="userId != null">
+            and uf.user_id = #{userId}
+        </if>
+        order by p.update_time desc
+        <include refid="limit"/>
+    </select>
+
+    <select id="selectPostFootCount" resultType="com.jlu.webcommunity.entity.vo.userFoot.GetPostUserFootCountVo">
+        select p.id postId,
+               (select count(*) FROM user_foot uf
+                where uf.read_status = 1 and uf.is_post = 1 and uf.post_id = postId and uf.deleted = '0') readCnt,
+               (select count(*) FROM user_foot uf
+                where uf.like_status = 1 and uf.is_post = 1 and uf.post_id = postId and uf.deleted = '0') likeCnt,
+               (select count(*) FROM user_foot uf
+                where uf.collect_status = 1 and uf.is_post = 1 and uf.post_id = postId and uf.deleted = '0') collectCnt
+        from post p
+        where p.deleted = '0'
+        group by p.id
+    </select>
+</mapper>

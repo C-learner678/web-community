@@ -2,7 +2,7 @@ package com.jlu.webcommunity.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jlu.webcommunity.entity.Comment;
-import com.jlu.webcommunity.entity.vo.GetCommentByPageVo;
+import com.jlu.webcommunity.entity.vo.comment.GetCommentByPageVo;
 import com.jlu.webcommunity.core.PageParam;
 import org.apache.ibatis.annotations.Param;
 

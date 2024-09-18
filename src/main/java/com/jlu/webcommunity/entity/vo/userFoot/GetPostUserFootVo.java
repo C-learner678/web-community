@@ -1,4 +1,4 @@
-package com.jlu.webcommunity.entity.vo;
+package com.jlu.webcommunity.entity.vo.userFoot;
 
 import lombok.Data;
 

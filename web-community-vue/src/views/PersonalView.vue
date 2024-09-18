@@ -71,7 +71,7 @@
             <el-table-column
               prop="op"
               label="操作"
-              width="240">
+              width="200">
               <template slot-scope="scope">
                 <el-button @click="clickModifyPost(scope.row)" type="text" size="small">修改</el-button>
                 <el-button @click="clickDeletePost(scope.row)" type="text" size="small">删除</el-button>
@@ -83,6 +83,52 @@
             :total="total"
             :page-size='pageSize'
             @current-change='pageChange'>
+          </el-pagination>
+          <br>
+          <div style="font-weight: bold">
+            收藏帖子
+          </div>
+          <el-table :data="collectPosts" style="width: 100%">
+            <el-table-column
+              prop="title"
+              label="帖子标题"
+              width="360">
+              <template slot-scope="scope">
+                <a :href="scope.row.postUrl">{{ scope.row.title }}</a>
+              </template>
+            </el-table-column>
+            <el-table-column
+              prop="sectionName"
+              label="板块"
+              width="180">
+              <template slot-scope="scope">
+                <a :href="scope.row.sectionUrl">{{ scope.row.sectionName }}</a>
+              </template>
+            </el-table-column>
+            <el-table-column
+              prop="createTime"
+              label="发帖时间"
+              width="240">
+            </el-table-column>
+            <el-table-column
+              prop="updateTime"
+              label="更新时间"
+              width="240">
+            </el-table-column>
+            <el-table-column
+              prop="op"
+              label="操作"
+              width="200">
+              <template slot-scope="scope">
+                <el-button @click="clickCancelCollectPost(scope.row)" type="text" size="small">取消收藏</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+          <el-pagination
+            layout="prev, pager, next"
+            :total="total"
+            :page-size='pageSize'
+            @current-change='collectPageChange'>
           </el-pagination>
         </el-col>
       </el-row>
@@ -144,6 +190,7 @@ import axios from 'axios'
 import { getCurrentUser, logout, modifyAvatar } from '@/api/userApi'
 import { getFollowNum, getFollowerNum } from '@/api/userFollowApi'
 import { getPostByPage, getPostCount, getPost, modifyPost, deletePost } from '@/api/postApi'
+import { getCollectPostByPage, modifyPostUserFoot } from '@/api/userFootApi'
 import UserFollowList from '@/components/UserFollowList.vue'
 import UserFollowerList from '@/components/UserFollowerList.vue'
 import ModifyUserInfo from '@/components/ModifyUserInfo.vue'
@@ -302,7 +349,37 @@ export default {
       })
       .catch(error => {
       });
-    }
+    },
+    // 帖子翻页
+    collectPageChange(collectPageIndex){
+      this.collectPageIndex = collectPageIndex
+      getCollectPostByPage(this.pageSize, this.collectPageIndex)
+      .then((res) => {
+        this.collectPosts = res.result
+        for (var i = 0; i < this.collectPosts.length; i++){ 
+          this.collectPosts[i].postUrl = 'post?id=' + this.collectPosts[i].id
+          this.collectPosts[i].sectionUrl = 'section?id=' + this.collectPosts[i].sectionId
+          this.collectPosts[i].createTime = new Date(this.collectPosts[i].createTime).toLocaleString()
+          this.collectPosts[i].updateTime = new Date(this.collectPosts[i].updateTime).toLocaleString()
+        }
+      }).catch((error) => {
+      })
+    },
+    // 取消收藏
+    clickCancelCollectPost(row){
+      this.$confirm('确定要取消收藏吗？', '', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        modifyPostUserFoot(row.id, 2, false)
+        .then((res) => {
+          this.collectPageChange(this.collectPageIndex)
+        }).catch((error) => {
+        })
+      }).catch(() => { 
+      })
+    },
   },
   data() {
     return {
@@ -325,7 +402,9 @@ export default {
       },
       imageUrl: '',
       uploadUrl: BASE_URL + 'image/uploadImage',
-      uploadHeader: {}
+      uploadHeader: {},
+      collectPosts: [],
+      collectPageIndex: 1,
     }
   },
   created() {
@@ -358,6 +437,17 @@ export default {
           this.posts[i].sectionUrl = 'section?id=' + this.posts[i].sectionId
           this.posts[i].createTime = new Date(this.posts[i].createTime).toLocaleString()
           this.posts[i].updateTime = new Date(this.posts[i].updateTime).toLocaleString()
+        }
+      }).catch((error) => {
+      })
+      getCollectPostByPage(this.pageSize, this.collectPageIndex)
+      .then((res) => {
+        this.collectPosts = res.result
+        for (var i = 0; i < this.collectPosts.length; i++){ 
+          this.collectPosts[i].postUrl = 'post?id=' + this.collectPosts[i].id
+          this.collectPosts[i].sectionUrl = 'section?id=' + this.collectPosts[i].sectionId
+          this.collectPosts[i].createTime = new Date(this.collectPosts[i].createTime).toLocaleString()
+          this.collectPosts[i].updateTime = new Date(this.collectPosts[i].updateTime).toLocaleString()
         }
       }).catch((error) => {
       })

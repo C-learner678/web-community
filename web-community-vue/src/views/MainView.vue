@@ -19,17 +19,29 @@
         </el-col>
       </el-row>
     </div>
+    <div style="margin-top: 440px;">
+      <el-row>
+        <el-col :span="21">
+          &nbsp;
+        </el-col>
+        <el-col :span="3">
+          <bei-an></bei-an>
+        </el-col>
+      </el-row>
+    </div>
   </div>
 </template>
 
 <script>
 import { getCurrentUser } from '@/api/userApi'
 import TopTab from "@/components/TopTab.vue"
+import BeiAn from "@/components/BeiAn.vue"
 
 export default {
   name: 'MainView',
   components: {
-    TopTab
+    TopTab,
+    BeiAn
   },
   methods: {
     clickPersonal(){

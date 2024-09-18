@@ -2,7 +2,7 @@ package com.jlu.webcommunity.service;
 
 import com.jlu.webcommunity.entity.Post;
 import com.jlu.webcommunity.entity.dto.post.*;
-import com.jlu.webcommunity.entity.vo.GetPostByPageVo;
+import com.jlu.webcommunity.entity.vo.post.GetPostByPageVo;
 
 import java.io.IOException;
 import java.util.List;

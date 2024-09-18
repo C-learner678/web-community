@@ -2,6 +2,8 @@ package com.jlu.webcommunity.controller;
 
 import com.jlu.webcommunity.core.aop.checkLogin.CheckLogin;
 import com.jlu.webcommunity.core.result.Result;
+import com.jlu.webcommunity.entity.dto.userFoot.GetCollectPostByPageDto;
+import com.jlu.webcommunity.entity.dto.userFoot.GetPostUserFootCountDto;
 import com.jlu.webcommunity.entity.dto.userFoot.GetPostUserFootDto;
 import com.jlu.webcommunity.entity.dto.userFoot.ModifyPostUserFootDto;
 import com.jlu.webcommunity.enums.StatusCodeEnum;
@@ -33,5 +35,16 @@ public class UserFootController {
         }else{
             return Result.fail(StatusCodeEnum.POST_NOT_EXIST);
         }
+    }
+
+    @PostMapping("/getPostUserFootCount")
+    public Result getPostUserFootCount(@RequestBody GetPostUserFootCountDto dto){
+        return Result.success(userFootService.getPostUserFootCount(dto));
+    }
+
+    @CheckLogin
+    @PostMapping("/getCollectPostByPage")
+    public Result getCollectPostByPage(@RequestBody GetCollectPostByPageDto dto){
+        return Result.success(userFootService.getCollectPostByPage(dto));
     }
 }

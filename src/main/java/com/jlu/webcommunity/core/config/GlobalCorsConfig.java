@@ -10,14 +10,11 @@ import org.springframework.web.filter.CorsFilter;
 //解决跨域问题
 @Configuration
 public class GlobalCorsConfig {
-    @Value("${server.front-port}")
-    private String frontPort;
-
     @Bean
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
         // 设置你要允许的网站域名
-        config.addAllowedOrigin("http://localhost:" + frontPort);
+        config.addAllowedOriginPattern("*");
         //允许跨域发送cookie
         config.setAllowCredentials(true);
         //放行全部原始头信息

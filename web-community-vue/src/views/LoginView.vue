@@ -46,6 +46,16 @@
         </el-card>
       </el-col>
     </el-row>
+    <div style="margin-top: 100px;">
+      <el-row>
+        <el-col :span="21">
+          &nbsp;
+        </el-col>
+        <el-col :span="3">
+          <bei-an></bei-an>
+        </el-col>
+      </el-row>
+    </div>
   </div>
 </template>
 
@@ -53,10 +63,13 @@
 import Cookies from "js-cookie"
 import md5 from 'js-md5'
 import {login, register, getCaptcha} from "@/api/userApi"
-
+import BeiAn from "@/components/BeiAn.vue"
 
 export default {
   name: 'LoginView',
+  components: {
+    BeiAn
+  },
   methods: {
     submitLoginForm() {
       this.$refs.loginForm.validate((valid) => {

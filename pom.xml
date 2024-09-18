@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.jlu</groupId>
     <artifactId>web-community</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.1</version>
     <name>web-community</name>
     <description>web-community</description>
     <properties>

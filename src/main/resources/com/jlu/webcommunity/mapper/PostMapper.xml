@@ -7,7 +7,7 @@
         </if>
     </sql>
 
-    <select id="selectPostByPage" resultType="com.jlu.webcommunity.entity.vo.GetPostByPageVo">
+    <select id="selectPostByPage" resultType="com.jlu.webcommunity.entity.vo.post.GetPostByPageVo">
         select p.id, p.user_id, ui.front_name as userFrontName, p.section_id, s.name as sectionName, p.title, p.create_time, p.update_time
         from post p
         inner join user_info ui on p.user_id = ui.user_id
@@ -53,7 +53,7 @@
         </if>
     </select>
 
-    <select id="selectPostByIds" resultType="com.jlu.webcommunity.entity.vo.GetPostByPageVo">
+    <select id="selectPostByIds" resultType="com.jlu.webcommunity.entity.vo.post.GetPostByPageVo">
         select p.id, p.user_id, ui.front_name as userFrontName, p.section_id, s.name as sectionName, p.title, p.create_time, p.update_time
         from post p
         inner join user_info ui on p.user_id = ui.user_id

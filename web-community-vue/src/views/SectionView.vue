@@ -40,6 +40,15 @@
               label="更新时间"
               width="240">
             </el-table-column>
+            <el-table-column
+              prop="op"
+              label="操作"
+              width="180"
+              v-if="user != null && user.role=='admin'">
+              <template slot-scope="scope">
+                <el-button @click="clickDeletePost(scope.row)" type="text" size="small">删除</el-button>
+              </template>
+            </el-table-column>
           </el-table>
           <el-table :data="posts" style="width: 100%" :show-header="topPosts.length == 0">
             <el-table-column

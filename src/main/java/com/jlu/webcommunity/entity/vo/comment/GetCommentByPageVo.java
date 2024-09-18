@@ -1,4 +1,4 @@
-package com.jlu.webcommunity.entity.vo;
+package com.jlu.webcommunity.entity.vo.comment;
 
 import lombok.Data;
 

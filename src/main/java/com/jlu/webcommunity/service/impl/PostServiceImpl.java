@@ -1,6 +1,5 @@
 package com.jlu.webcommunity.service.impl;
 
-import cn.hutool.core.util.RandomUtil;
 import com.jlu.webcommunity.constant.MessageTypeConstant;
 import com.jlu.webcommunity.constant.RedisConstant;
 import com.jlu.webcommunity.constant.RocketmqConstant;
@@ -11,7 +10,7 @@ import com.jlu.webcommunity.dao.SectionDao;
 import com.jlu.webcommunity.entity.Post;
 import com.jlu.webcommunity.entity.dto.post.*;
 import com.jlu.webcommunity.entity.dto.userFoot.ModifyPostUserFootDto;
-import com.jlu.webcommunity.entity.vo.GetPostByPageVo;
+import com.jlu.webcommunity.entity.vo.post.GetPostByPageVo;
 import com.jlu.webcommunity.core.filter.context.UserContext;
 import com.jlu.webcommunity.enums.UserFootTypeEnum;
 import com.jlu.webcommunity.service.PostService;

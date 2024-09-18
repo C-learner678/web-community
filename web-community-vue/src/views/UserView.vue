@@ -39,7 +39,7 @@
           </el-switch>
           <br>
           <div style="font-weight: bold">
-           历史发帖
+            历史发帖
           </div>
           <el-table :data="posts" style="width: 100%">
             <el-table-column
