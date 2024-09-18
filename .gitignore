@@ -38,7 +38,6 @@ logs/
 start.txt
 upload.txt
 src/main/resources/application.yml
-src/main/resources/application-dev.yml
 src/main/resources/application-prod.yml
 src/main/resources/docker-compose.yml
 src/main/resources/docker-compose1.yml
