@@ -18,6 +18,7 @@ public enum StatusCodeEnum {
     POST_NOT_EXIST(1100, "帖子不存在"),
     SECTION_NOT_EXIST(1101, "版块不存在"),
     USER_NOT_EXIST(1102, "用户不存在"),
+    COMMENT_NOT_EXIST(1103, "评论不存在"),
     ADD_POST_FAILED(1200, "发帖失败"),
     MODIFY_POST_FAILED(1201, "修改帖子失败"),
     DELETE_POST_FAILED(1202, "删帖失败"),

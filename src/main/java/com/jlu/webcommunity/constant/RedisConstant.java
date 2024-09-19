@@ -15,4 +15,5 @@ public class RedisConstant {
     public final static String postReadNumKey = "POST_READ_NUM_KEY";
     public final static String postLikeNumKey = "POST_LIKE_NUM_KEY";
     public final static String postCollectNumKey = "POST_COLLECT_NUM_KEY";
+    public final static String commentLikeNumKey = "COMMENT_LIKE_NUM_KEY";
 }

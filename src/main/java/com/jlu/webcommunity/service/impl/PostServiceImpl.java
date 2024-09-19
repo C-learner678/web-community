@@ -184,6 +184,12 @@ public class PostServiceImpl implements PostService {
         List<GetPostByPageVo> posts = postDao.getBaseMapper().selectPostByPage(
                 dto.getSectionId(), dto.getUserId(), dto.getTop(), null,
                 PageParam.getInstance(dto.getPageNum(), dto.getPageSize()));
+        for(GetPostByPageVo post: posts){
+            post.setReadCnt((Integer) redisClient.hGet(RedisConstant.postStatisticKey + post.getId(),
+                    RedisConstant.postReadNumKey));
+            post.setLikeCnt((Integer) redisClient.hGet(RedisConstant.postStatisticKey + post.getId(),
+                    RedisConstant.postLikeNumKey));
+        }
         return posts;
     }
 

@@ -14,4 +14,6 @@ public class GetCommentByPageVo {
     private String content;
     private Date createTime;
     private Date updateTime;
+    private Integer likeCnt;
+    private Boolean likeStatus;
 }

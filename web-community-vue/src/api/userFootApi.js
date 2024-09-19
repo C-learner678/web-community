@@ -43,3 +43,14 @@ export function getCollectPostByPage(pageSize, pageNum){
     }
   })  
 }
+
+export function modifyCommentUserFoot(commentId, positive){
+  return request({
+    url: '/userFoot/modifyCommentUserFoot',
+    method: 'POST',
+    data: {
+      commentId,
+      positive
+    }
+  })
+}

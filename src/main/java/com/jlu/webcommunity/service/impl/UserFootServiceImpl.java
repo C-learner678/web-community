@@ -9,16 +9,15 @@ import com.jlu.webcommunity.core.RedisClient;
 import com.jlu.webcommunity.core.filter.context.UserContext;
 import com.jlu.webcommunity.core.rocketmq.RocketmqBody;
 import com.jlu.webcommunity.core.rocketmq.RocketmqProducer;
+import com.jlu.webcommunity.dao.CommentDao;
 import com.jlu.webcommunity.dao.PostDao;
 import com.jlu.webcommunity.dao.UserFootDao;
+import com.jlu.webcommunity.entity.Comment;
 import com.jlu.webcommunity.entity.Post;
 import com.jlu.webcommunity.entity.UserFoot;
-import com.jlu.webcommunity.entity.dto.post.GetPostByPageDto;
-import com.jlu.webcommunity.entity.dto.userFoot.GetCollectPostByPageDto;
-import com.jlu.webcommunity.entity.dto.userFoot.GetPostUserFootCountDto;
-import com.jlu.webcommunity.entity.dto.userFoot.GetPostUserFootDto;
-import com.jlu.webcommunity.entity.dto.userFoot.ModifyPostUserFootDto;
+import com.jlu.webcommunity.entity.dto.userFoot.*;
 import com.jlu.webcommunity.entity.vo.post.GetPostByPageVo;
+import com.jlu.webcommunity.entity.vo.userFoot.GetCommentUserFootCountVo;
 import com.jlu.webcommunity.entity.vo.userFoot.GetPostUserFootCountVo;
 import com.jlu.webcommunity.entity.vo.userFoot.GetPostUserFootVo;
 import com.jlu.webcommunity.enums.UserFootTypeEnum;
@@ -39,16 +38,20 @@ public class UserFootServiceImpl implements UserFootService {
     private PostDao postDao;
 
     @Autowired
+    private CommentDao commentDao;
+
+    @Autowired
     private RedisClient redisClient;
 
     @Autowired
     private RocketmqProducer rocketmqProducer;
 
+    // 帖子足迹
     @Override
     public GetPostUserFootVo getPostUserFoot(GetPostUserFootDto dto) {
         QueryWrapper<UserFoot> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("deleted", false);
-        queryWrapper.eq("user_id", dto.getUserId());
+        queryWrapper.eq("user_id", UserContext.getUserData().getId());
         queryWrapper.eq("post_id", dto.getPostId());
         queryWrapper.eq("is_post", true);
         UserFoot userFoot = userFootDao.getOne(queryWrapper);
@@ -108,16 +111,19 @@ public class UserFootServiceImpl implements UserFootService {
                     return;
                 }
                 userFoot.setReadStatus(dto.getPositive());
+                userFoot.setUpdateTime(new Date());
             }else if(dto.getType().equals(UserFootTypeEnum.LIKE)){
                 if(userFoot.getLikeStatus().equals(dto.getPositive())){
                     return;
                 }
                 userFoot.setLikeStatus(dto.getPositive());
+                userFoot.setUpdateTime(new Date());
             }else if(dto.getType().equals(UserFootTypeEnum.COLLECT)){
                 if(userFoot.getCollectStatus().equals(dto.getPositive())){
                     return;
                 }
                 userFoot.setCollectStatus(dto.getPositive());
+                userFoot.setUpdateTime(new Date());
             }
             userFootDao.updateById(userFoot);
         }
@@ -155,6 +161,22 @@ public class UserFootServiceImpl implements UserFootService {
         }
     }
 
+    // 获取收藏帖子
+    @Override
+    public List<GetPostByPageVo> getCollectPostByPage(GetCollectPostByPageDto dto) {
+        List<GetPostByPageVo> posts = userFootDao.getBaseMapper().selectCollectPostByPage(
+                UserContext.getUserData().getId(),
+                PageParam.getInstance(dto.getPageNum(), dto.getPageSize()));
+        for(GetPostByPageVo post: posts){
+            post.setReadCnt((Integer) redisClient.hGet(RedisConstant.postStatisticKey + post.getId(),
+                    RedisConstant.postReadNumKey));
+            post.setLikeCnt((Integer) redisClient.hGet(RedisConstant.postStatisticKey + post.getId(),
+                    RedisConstant.postLikeNumKey));
+        }
+        return posts;
+    }
+
+    // 帖子足迹统计
     @Override
     public GetPostUserFootCountVo getPostUserFootCount(GetPostUserFootCountDto dto) {
         GetPostUserFootCountVo vo = new GetPostUserFootCountVo();
@@ -167,14 +189,71 @@ public class UserFootServiceImpl implements UserFootService {
         return vo;
     }
 
+    /*
     @Override
-    public List<GetPostByPageVo> getCollectPostByPage(GetCollectPostByPageDto dto) {
-        List<GetPostByPageVo> posts = userFootDao.getBaseMapper().selectCollectPostByPage(
-                UserContext.getUserData().getId(),
-                PageParam.getInstance(dto.getPageNum(), dto.getPageSize()));
-        return posts;
+    public GetCommentUserFootVo getCommentUserFoot(GetCommentUserFootDto dto) {
+        QueryWrapper<UserFoot> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("deleted", false);
+        queryWrapper.eq("user_id", dto.getUserId());
+        queryWrapper.eq("post_id", dto.getCommentId());
+        queryWrapper.eq("is_post", false);
+        UserFoot userFoot = userFootDao.getOne(queryWrapper);
+        GetCommentUserFootVo vo = new GetCommentUserFootVo();
+        vo.setLikeStatus(false);
+        if (userFoot != null) {
+            vo.setLikeStatus(userFoot.getLikeStatus());
+        }
+        return vo;
     }
+    */
 
+    // 评论足迹（只有喜欢，没有已读和收藏）
+    @Override
+    public Boolean modifyCommentUserFoot(ModifyCommentUserFootDto dto) {
+        Comment comment = commentDao.getById(dto.getCommentId());
+        if(comment == null || comment.getDeleted()){
+            return false;
+        }
+        QueryWrapper<UserFoot> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("deleted", false);
+        queryWrapper.eq("user_id", UserContext.getUserData().getId());
+        queryWrapper.eq("post_id", dto.getCommentId());
+        queryWrapper.eq("is_post", false);
+        UserFoot userFoot = userFootDao.getOne(queryWrapper);
+        if(userFoot == null){
+            userFoot = new UserFoot();
+            userFoot.setUserId(UserContext.getUserData().getId());
+            userFoot.setPostId(dto.getCommentId());
+            userFoot.setIsPost(false);
+            userFoot.setLikeStatus(dto.getPositive());
+            userFoot.setDeleted(false);
+            userFoot.setCreateTime(new Date());
+            userFoot.setUpdateTime(new Date());
+            userFootDao.save(userFoot);
+        }else{
+            if(userFoot.getLikeStatus().equals(dto.getPositive())){
+                return true;
+            }
+            userFoot.setLikeStatus(dto.getPositive());
+            userFoot.setUpdateTime(new Date());
+            userFootDao.updateById(userFoot);
+        }
+        // 统计
+        if(dto.getPositive()) {
+            redisClient.incr(RedisConstant.commentLikeNumKey + dto.getCommentId(), 1L);
+        }else{
+            redisClient.incr(RedisConstant.commentLikeNumKey + dto.getCommentId(), -1L);
+        }
+        // 通知
+        if(dto.getPositive()){
+            RocketmqBody body = new RocketmqBody();
+            body.setFromUserId(UserContext.getUserData().getId());
+            body.setRelateId(dto.getCommentId());
+            body.setType(MessageTypeConstant.ADD_LIKE_COMMENT);
+            rocketmqProducer.syncSend(body, RocketmqConstant.topic);
+        }
+        return true;
+    }
 
     // 统计每个帖子的已读、喜欢、收藏情况
     @Override
@@ -187,6 +266,10 @@ public class UserFootServiceImpl implements UserFootService {
                     RedisConstant.postLikeNumKey, vo.getLikeCnt());
             redisClient.hSet(RedisConstant.postStatisticKey + vo.getPostId(),
                     RedisConstant.postCollectNumKey, vo.getCollectCnt());
+        }
+        List<GetCommentUserFootCountVo> list1 = userFootDao.getBaseMapper().selectCommentFootCount();
+        for(GetCommentUserFootCountVo vo: list1){
+            redisClient.set(RedisConstant.commentLikeNumKey + vo.getCommentId(), vo.getLikeCnt());
         }
     }
 

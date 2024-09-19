@@ -33,12 +33,22 @@
             <el-table-column
               prop="createTime"
               label="发帖时间"
-              width="240">
+              width="180">
             </el-table-column>
             <el-table-column
               prop="updateTime"
               label="更新时间"
-              width="240">
+              width="180">
+            </el-table-column>
+            <el-table-column
+              prop="readCnt"
+              label="已读"
+              width="60">
+            </el-table-column>
+            <el-table-column
+              prop="likeCnt"
+              label="喜欢"
+              width="60">
             </el-table-column>
             <el-table-column
               prop="op"
@@ -70,12 +80,22 @@
             <el-table-column
               prop="createTime"
               label="发帖时间"
-              width="240">
+              width="180">
             </el-table-column>
             <el-table-column
               prop="updateTime"
               label="更新时间"
-              width="240">
+              width="180">
+            </el-table-column>
+            <el-table-column
+              prop="readCnt"
+              label="已读"
+              width="60">
+            </el-table-column>
+            <el-table-column
+              prop="likeCnt"
+              label="喜欢"
+              width="60">
             </el-table-column>
             <el-table-column
               prop="op"

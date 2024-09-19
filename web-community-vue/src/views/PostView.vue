@@ -14,6 +14,8 @@
           作者：<a :href="authorUrl">{{ author.frontName }}</a>&nbsp;&nbsp;&nbsp;
           所属板块：<a :href="sectionUrl">{{ section.name }}</a>&nbsp;&nbsp;&nbsp;
           已读：{{ userFootCount.readCnt }}&nbsp;&nbsp;&nbsp;
+          喜欢：{{ userFootCount.likeCnt }}&nbsp;&nbsp;&nbsp;
+          收藏：{{ userFootCount.collectCnt }}&nbsp;&nbsp;&nbsp;
           <el-button type="text" @click="clickDeletePost"
             v-if="user != null && (user.role == 'admin' || user.userId == post.userId)">删除</el-button><br>
           <v-md-preview :text="post.content"></v-md-preview>
@@ -22,15 +24,15 @@
           <el-row>
             <el-col :span="2">
               <div v-if="userFoot.likeStatus == true">
-                <el-button type="primary" size="small" @click="cancelLikePost()">已点赞：{{ userFootCount.likeCnt }}</el-button>
+                <el-button type="primary" size="small" @click="cancelLikePost()">取消点赞</el-button>
               </div>
               <div v-else>
-                <el-button type="primary" size="small" @click="likePost()">点赞：{{ userFootCount.likeCnt }}</el-button>
+                <el-button type="primary" size="small" @click="likePost()">点赞</el-button>
               </div>
             </el-col>
             <el-col :span="2">
               <div v-if="userFoot.collectStatus == true">
-                <el-button type="primary" size="small" @click="cancelCollectPost()">已收藏</el-button>
+                <el-button type="primary" size="small" @click="cancelCollectPost()">取消收藏</el-button>
               </div>
               <div v-else>
                 <el-button type="primary" size="small" @click="collectPost()">收藏</el-button>
@@ -70,9 +72,22 @@
               width="180">
             </el-table-column>
             <el-table-column
+              prop="likeCnt"
+              label="喜欢"
+              width="80">
+              <template slot-scope="scope">
+                <div v-if="scope.row.likeStatus == true">
+                  <el-button type="text" size="small" @click="cancelLikeComment(scope.row)">已喜欢：{{ scope.row.likeCnt }}</el-button>
+                </div>
+                <div v-else>
+                  <el-button type="text" size="small" @click="likeComment(scope.row)">喜欢：{{ scope.row.likeCnt }}</el-button>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column
               prop="op"
               label="操作"
-              width="120"
+              width="60"
               v-if="user != null && user.role=='admin'">
               <template slot-scope="scope">
                 <el-button @click="clickDeleteComment(scope.row)" type="text" size="small">删除</el-button>
@@ -108,7 +123,7 @@ import { getPost, deletePost, adminDeletePost } from '@/api/postApi'
 import { getCommentByPage, getCommentCount, addComment, deleteComment } from '@/api/commentApi'
 import { getCurrentUser, getUserInfo } from '@/api/userApi'
 import { getSection } from '@/api/sectionApi'
-import { getPostUserFoot, getPostUserFootCount, modifyPostUserFoot } from '@/api/userFootApi'
+import { getPostUserFoot, getPostUserFootCount, modifyPostUserFoot, modifyCommentUserFoot } from '@/api/userFootApi'
 import TopTab from '@/components/TopTab.vue'
 import OriginalAvatar from '@/components/OriginalAvatar.vue'
 
@@ -199,24 +214,16 @@ export default {
     likePost(){
       modifyPostUserFoot(this.postId, 1, true)
       .then((res) => {
-        getPostUserFoot(this.postId, this.user.userId)
-        .then((res) => {
-          this.userFoot = res.result
-          this.userFootCount.likeCnt += 1;
-        }).catch((error) => {
-        })
+        this.userFoot.likeStatus = true
+        this.userFootCount.likeCnt += 1
       }).catch((error) => {
       })
     },
     cancelLikePost(){
       modifyPostUserFoot(this.postId, 1, false)
       .then((res) => {
-        getPostUserFoot(this.postId, this.user.userId)
-        .then((res) => {
-          this.userFoot = res.result
-          this.userFootCount.likeCnt -= 1;
-        }).catch((error) => {
-        })
+        this.userFoot.likeStatus = false
+        this.userFootCount.likeCnt -= 1
       }).catch((error) => {
       })
     },
@@ -224,22 +231,33 @@ export default {
     collectPost(){
       modifyPostUserFoot(this.postId, 2, true)
       .then((res) => {
-        getPostUserFoot(this.postId, this.user.userId)
-        .then((res) => {
-          this.userFoot = res.result
-        }).catch((error) => {
-        })
+        this.userFoot.collectStatus = true
+        this.userFootCount.collectCnt += 1
       }).catch((error) => {
       })
     },
     cancelCollectPost(){
       modifyPostUserFoot(this.postId, 2, false)
       .then((res) => {
-        getPostUserFoot(this.postId, this.user.userId)
-        .then((res) => {
-          this.userFoot = res.result
-        }).catch((error) => {
-        })
+        this.userFoot.collectStatus = false
+        this.userFootCount.collectCnt -= 1
+      }).catch((error) => {
+      })
+    },
+    // 喜欢评论
+    likeComment(row){
+      modifyCommentUserFoot(row.id, true)
+      .then((res) => {
+        row.likeStatus = true
+        row.likeCnt += 1
+      }).catch((error) => {
+      })
+    },
+    cancelLikeComment(row){
+      modifyCommentUserFoot(row.id, false)
+      .then((res) => {
+        row.likeStatus = false
+        row.likeCnt -= 1
       }).catch((error) => {
       })
     }

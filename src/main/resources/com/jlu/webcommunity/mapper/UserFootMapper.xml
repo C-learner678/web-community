@@ -37,4 +37,13 @@
         where p.deleted = '0'
         group by p.id
     </select>
+
+    <select id="selectCommentFootCount" resultType="com.jlu.webcommunity.entity.vo.userFoot.GetCommentUserFootCountVo">
+        select p.id commentId,
+               (select count(*) FROM user_foot uf
+                where uf.like_status = 1 and uf.is_post = 0 and uf.post_id = commentId and uf.deleted = '0') likeCnt
+        from post p
+        where p.deleted = '0'
+        group by p.id
+    </select>
 </mapper>

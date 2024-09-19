@@ -5,5 +5,4 @@ import lombok.Data;
 @Data
 public class GetPostUserFootDto {
     private Long postId;
-    private Long userId;
 }

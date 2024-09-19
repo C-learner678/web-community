@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
+// 这个类用来消化消息队列里的消息
 @Slf4j
 @Service
 public class NotifyMessageServiceImpl implements NotifyMessageService {
@@ -40,7 +41,7 @@ public class NotifyMessageServiceImpl implements NotifyMessageService {
         NotifyMessage notifyMessage = new NotifyMessage();
         notifyMessage.setUserId(userId);
         notifyMessage.setFromUserId(fromUserId);
-        notifyMessage.setRelateId(postId);
+        notifyMessage.setPostId(postId);
         notifyMessage.setType(MessageTypeConstant.ADD_LIKE_POST);
         notifyMessage.setCreateTime(new Date());
         notifyMessage.setUpdateTime(new Date());
@@ -53,7 +54,7 @@ public class NotifyMessageServiceImpl implements NotifyMessageService {
         NotifyMessage notifyMessage = new NotifyMessage();
         notifyMessage.setUserId(userId);
         notifyMessage.setFromUserId(fromUserId);
-        notifyMessage.setRelateId(postId);
+        notifyMessage.setPostId(postId);
         notifyMessage.setType(MessageTypeConstant.ADD_COMMENT);
         notifyMessage.setMessage(comment);
         notifyMessage.setCreateTime(new Date());
@@ -87,7 +88,7 @@ public class NotifyMessageServiceImpl implements NotifyMessageService {
         NotifyMessage notifyMessage = new NotifyMessage();
         notifyMessage.setUserId(userId);
         notifyMessage.setFromUserId(fromUserId);
-        notifyMessage.setRelateId(commentId);
+        notifyMessage.setCommentId(commentId);
         notifyMessage.setType(MessageTypeConstant.ADD_LIKE_COMMENT);
         notifyMessage.setCreateTime(new Date());
         notifyMessage.setUpdateTime(new Date());
@@ -98,7 +99,7 @@ public class NotifyMessageServiceImpl implements NotifyMessageService {
     public void notifyDeletePost(Long userId, Long postId) {
         NotifyMessage notifyMessage = new NotifyMessage();
         notifyMessage.setUserId(userId);
-        notifyMessage.setRelateId(postId);
+        notifyMessage.setPostId(postId);
         notifyMessage.setType(MessageTypeConstant.DELETE_POST);
         notifyMessage.setCreateTime(new Date());
         notifyMessage.setUpdateTime(new Date());
@@ -109,7 +110,7 @@ public class NotifyMessageServiceImpl implements NotifyMessageService {
     public void notifyDeleteComment(Long userId, Long commentId) {
         NotifyMessage notifyMessage = new NotifyMessage();
         notifyMessage.setUserId(userId);
-        notifyMessage.setRelateId(commentId);
+        notifyMessage.setCommentId(commentId);
         notifyMessage.setType(MessageTypeConstant.DELETE_COMMENT);
         notifyMessage.setCreateTime(new Date());
         notifyMessage.setUpdateTime(new Date());

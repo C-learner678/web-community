@@ -14,4 +14,6 @@ public class GetPostByPageVo {
     private String title;
     private Date createTime;
     private Date updateTime;
+    private Integer readCnt;
+    private Integer likeCnt;
 }

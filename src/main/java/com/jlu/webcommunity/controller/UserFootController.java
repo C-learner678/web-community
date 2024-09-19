@@ -2,10 +2,7 @@ package com.jlu.webcommunity.controller;
 
 import com.jlu.webcommunity.core.aop.checkLogin.CheckLogin;
 import com.jlu.webcommunity.core.result.Result;
-import com.jlu.webcommunity.entity.dto.userFoot.GetCollectPostByPageDto;
-import com.jlu.webcommunity.entity.dto.userFoot.GetPostUserFootCountDto;
-import com.jlu.webcommunity.entity.dto.userFoot.GetPostUserFootDto;
-import com.jlu.webcommunity.entity.dto.userFoot.ModifyPostUserFootDto;
+import com.jlu.webcommunity.entity.dto.userFoot.*;
 import com.jlu.webcommunity.enums.StatusCodeEnum;
 import com.jlu.webcommunity.service.UserFootService;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +37,16 @@ public class UserFootController {
     @PostMapping("/getPostUserFootCount")
     public Result getPostUserFootCount(@RequestBody GetPostUserFootCountDto dto){
         return Result.success(userFootService.getPostUserFootCount(dto));
+    }
+
+    @CheckLogin
+    @PostMapping("/modifyCommentUserFoot")
+    public Result modifyCommentUserFoot(@RequestBody ModifyCommentUserFootDto dto){
+        if(userFootService.modifyCommentUserFoot(dto)) {
+            return Result.success();
+        }else{
+            return Result.fail(StatusCodeEnum.COMMENT_NOT_EXIST);
+        }
     }
 
     @CheckLogin
