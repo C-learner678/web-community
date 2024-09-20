@@ -1,6 +1,6 @@
 <template>
   <div>
-    <top-tab :user="user"></top-tab>
+    <top-tab :user="user" :show-back="false"></top-tab>
     <div>
       <el-row>
         <el-col :span="4">&nbsp;</el-col>

@@ -1,13 +1,6 @@
 <template>
   <div>
-    <div style="text-align:left;">
-      <el-button size="small" @click="clickBack">回到首页</el-button>
-      <div style="float:right;">
-        <el-button size="small" @click="clickSearch" icon="el-icon-search">站内搜索</el-button>
-        <el-button size="small" @click="clickPersonal" icon="el-icon-user-solid">个人中心</el-button>
-        <el-button size="small" @click="clickLogout">退出登录</el-button>
-      </div>
-    </div>
+    <top-tab :user="user" :show-message="false"></top-tab>
     <div>
       <br>
       <el-row>
@@ -37,35 +30,14 @@
 <script>
 import { getCurrentUser, logout } from '@/api/userApi'
 import { getNotifyMessageCount, getNotifyMessageByPage } from '@/api/notifyMessageApi';
+import TopTab from '@/components/TopTab.vue';
 
 export default {
   name: 'MessageView',
   components:{
-
+    TopTab
   },
   methods: {
-    // 退出登录
-    clickLogout() {
-      logout().then((res) => {
-        sessionStorage.clear()
-        this.$router.push("/login")
-      }).catch((error) => {
-        sessionStorage.clear()
-        this.$router.push("/login")
-      });
-    },
-    // 首页
-    clickBack(){
-      this.$router.push("/main")
-    },
-    // 个人中心
-    clickPersonal(){
-      this.$router.push("/personal")
-    },
-    // 帖子搜索
-    clickSearch(){
-      this.$router.push("/searchPost")
-    },
     // 翻页
     pageChange(pageIndex){
       this.pageIndex = pageIndex
@@ -81,7 +53,6 @@ export default {
       for (var i = 0; i < messages.length; i++){ 
         if(messages[i].type == 1){ // 关注
           messages[i].content = '您被用户<a href="user?id=' + messages[i].fromUserId + '">' + messages[i].fromUserName + '</a>关注了。';
-          console.log(messages[i].content)
         }else if(messages[i].type == 2){ // 喜欢帖子
           messages[i].content = '您的帖子<a href="post?id=' + messages[i].postId + '">' + messages[i].postTitle + '</a>被用户<a href="user?id=' + messages[i].fromUserId + '">' + messages[i].fromUserName + '</a>点赞了。'
         }else if(messages[i].type == 3){ // 评论

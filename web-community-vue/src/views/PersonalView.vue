@@ -1,16 +1,6 @@
 <template>
   <div>
-    <div style="text-align:left;">
-      <el-button size="small" @click="clickBack">回到首页</el-button>
-      <div style="float:right;">
-        <el-button size="small" @click="clickSearch" icon="el-icon-search">站内搜索</el-button>
-        <el-button v-if="messageCnt == 0" size="small" @click="clickMessage" icon="el-icon-bell">消息通知</el-button>
-        <el-button v-else size="small" @click="clickMessage" icon="el-icon-bell">{{ messageCnt }}条新消息</el-button>
-        <el-button size="small" @click="clickModifyPassword">修改密码</el-button>
-        <el-button size="small" @click="clickLogout">退出登录</el-button>
-      </div>
-    </div>
-    <br>
+    <top-tab :user="user" :show-personal="false"></top-tab>
     <div>
       <el-row>
         <el-col :span="1">&nbsp;</el-col>
@@ -29,6 +19,7 @@
           <el-descriptions title="用户信息" :column="4">
             <template slot="extra">
               <el-button type="primary" size="small" @click="clickModifyInfo">修改信息</el-button>
+              <el-button type="primary" size="small" @click="clickModifyPassword">修改密码</el-button>
             </template>
             <el-descriptions-item label="用户名">{{ user.name }}</el-descriptions-item>
             <el-descriptions-item label="展示名称">{{ user.frontName }}</el-descriptions-item>
@@ -210,7 +201,7 @@
 <script>
 import BASE_URL from '@/request/baseUrl'
 import axios from 'axios'
-import { getCurrentUser, logout, modifyAvatar } from '@/api/userApi'
+import { getCurrentUser, modifyAvatar } from '@/api/userApi'
 import { getFollowNum, getFollowerNum } from '@/api/userFollowApi'
 import { getPostByPage, getPostCount, getPost, modifyPost, deletePost } from '@/api/postApi'
 import { getCollectPostByPage, modifyPostUserFoot } from '@/api/userFootApi'
@@ -220,6 +211,7 @@ import UserFollowerList from '@/components/UserFollowerList.vue'
 import ModifyUserInfo from '@/components/ModifyUserInfo.vue'
 import ModifyPassword from '@/components/ModifyPassword.vue'
 import OriginalAvatar from '@/components/OriginalAvatar.vue'
+import TopTab from '@/components/TopTab.vue'
 
 export default {
   name: 'PersonalView',
@@ -228,19 +220,10 @@ export default {
     UserFollowerList,
     ModifyUserInfo,
     ModifyPassword,
-    OriginalAvatar
+    OriginalAvatar,
+    TopTab
   },
   methods: {
-    // 退出登录
-    clickLogout() {
-      logout().then((res) => {
-        sessionStorage.clear()
-        this.$router.push("/login")
-      }).catch((error) => {
-        sessionStorage.clear()
-        this.$router.push("/login")
-      });
-    },
     // 回到首页
     clickBack(){
       this.$router.push("/main")
@@ -291,7 +274,6 @@ export default {
       .then((res) => {
         this.ModifyPostForm.title = res.result.title
         this.ModifyPostForm.content = res.result.content
-        console.log(this.ModifyPostForm)
       }).catch((error) => {
       })
       this.showModifyPost = true
