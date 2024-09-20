@@ -35,6 +35,5 @@
         <if test="userId != null">
             and c.user_id = #{userId}
         </if>
-        order by c.update_time asc
     </select>
 </mapper>

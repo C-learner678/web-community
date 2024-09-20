@@ -17,7 +17,6 @@ public class NotifyMessage {
     private Long fromUserId;
     private Long postId;
     private Long commentId;
-    private String message;
     private Boolean deleted;
     private Date createTime;
     private Date updateTime;

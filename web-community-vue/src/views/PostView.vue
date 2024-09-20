@@ -21,24 +21,10 @@
           <v-md-preview :text="post.content"></v-md-preview>
         </div>
         <div>
-          <el-row>
-            <el-col :span="2">
-              <div v-if="userFoot.likeStatus == true">
-                <el-button type="primary" size="small" @click="cancelLikePost()">取消点赞</el-button>
-              </div>
-              <div v-else>
-                <el-button type="primary" size="small" @click="likePost()">点赞</el-button>
-              </div>
-            </el-col>
-            <el-col :span="2">
-              <div v-if="userFoot.collectStatus == true">
-                <el-button type="primary" size="small" @click="cancelCollectPost()">取消收藏</el-button>
-              </div>
-              <div v-else>
-                <el-button type="primary" size="small" @click="collectPost()">收藏</el-button>
-              </div>
-            </el-col>
-          </el-row>
+          <el-button v-if="userFoot.likeStatus == true" type="primary" size="small" @click="cancelLikePost() ">取消点赞</el-button>
+          <el-button v-else type="primary" size="small" @click="likePost()">点赞</el-button>
+          <el-button v-if="userFoot.collectStatus == true" type="primary" size="small" @click="cancelCollectPost()">取消收藏</el-button>
+          <el-button v-else type="primary" size="small" @click="collectPost()">收藏</el-button>
         </div>
         <div>
           <br>评论：<br>

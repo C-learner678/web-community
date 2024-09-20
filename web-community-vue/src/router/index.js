@@ -7,6 +7,7 @@ import PostView from '@/views/PostView.vue'
 import UserView from '@/views/UserView.vue'
 import PersonalView from '@/views/PersonalView.vue'
 import SearchPostView from '@/views/SearchPostView.vue'
+import MessageView from '@/views/MessageView.vue'
 
 Vue.use(VueRouter)
 
@@ -50,6 +51,11 @@ const routes = [
     path: '/searchPost',
     name: 'searchPost',
     component: SearchPostView
+  },
+  {
+    path: '/message',
+    name: 'message',
+    component: MessageView
   }
 ]
 

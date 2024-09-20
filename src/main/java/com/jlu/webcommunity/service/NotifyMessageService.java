@@ -1,12 +1,12 @@
 package com.jlu.webcommunity.service;
 
+import com.jlu.webcommunity.entity.dto.notifyMessage.GetNotifyMessageByPageDto;
+import com.jlu.webcommunity.entity.dto.notifyMessage.GetNotifyMessageCountDto;
+import com.jlu.webcommunity.entity.vo.notifyMessage.GetNotifyMessageByPageVo;
+
+import java.util.List;
+
 public interface NotifyMessageService {
-    void notifyAddUserFollow(Long userId, Long followUserId);
-    void notifyAddLikePost(Long fromUserId, Long postId);
-    void notifyAddComment(Long fromUserId, Long postId, String comment);
-    void notifyBanUser(Long userId);
-    void notifyCancelBanUser(Long userId);
-    void notifyAddLikeComment(Long fromUserId, Long commentId);
-    void notifyDeletePost(Long userId, Long postId);
-    void notifyDeleteComment(Long userId, Long commentId);
+    List<GetNotifyMessageByPageVo> getNotifyMessageByPage(GetNotifyMessageByPageDto dto);
+    int getNotifyMessageCount(GetNotifyMessageCountDto dto);
 }

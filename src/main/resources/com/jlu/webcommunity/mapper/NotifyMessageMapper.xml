@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jlu.webcommunity.mapper.NotifyMessageMapper">
+    <sql id="limit">
+        <if test="pageParam != null">
+            limit #{pageParam.offset}, #{pageParam.limit}
+        </if>
+    </sql>
+
+    <select id="getNotifyMessageByPage" resultType="com.jlu.webcommunity.entity.vo.notifyMessage.GetNotifyMessageByPageVo">
+        select nm.type type, nm.from_user_id fromUserId, ui2.front_name fromUserName, nm.post_id postId,
+               p.title postTitle, nm.comment_id commentId, c.content commentContent, nm.create_time createTime
+        from notify_message nm
+        inner join user_info ui on nm.user_id = ui.user_id
+        left join user_info ui2 on nm.from_user_id = ui2.user_id
+        left join post p on nm.post_id = p.id
+        left join comment c on nm.comment_id = c.id
+        where
+        nm.deleted = '0'
+        and DATE_SUB(CURDATE(), INTERVAL 30 DAY) &lt;= nm.create_time
+        <if test="userId != null">
+            and nm.user_id = #{userId}
+        </if>
+        order by nm.create_time desc
+        <include refid="limit"/>
+    </select>
+
+
+    <select id="getNotifyMessageCount" resultType="Integer">
+        select count(*)
+        from notify_message nm
+        where
+        nm.deleted = '0'
+        and DATE_SUB(CURDATE(), INTERVAL 30 DAY) &lt;= nm.create_time
+        <if test="viewed != null and viewed == false" >
+            and nm.viewed = false
+        </if>
+        <if test="userId != null">
+            and nm.user_id = #{userId}
+        </if>
+    </select>
+</mapper>

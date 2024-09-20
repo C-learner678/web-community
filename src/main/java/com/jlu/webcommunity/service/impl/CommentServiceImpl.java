@@ -105,9 +105,9 @@ public class CommentServiceImpl implements CommentService {
         commentDao.save(comment);
         RocketmqBody body = new RocketmqBody();
         body.setFromUserId(UserContext.getUserData().getId());
-        body.setRelateId(dto.getPostId());
+        body.setPostId(dto.getPostId());
+        body.setCommentId(comment.getId());
         body.setType(MessageTypeConstant.ADD_COMMENT);
-        body.setMessage(dto.getContent());
         rocketmqProducer.syncSend(body, RocketmqConstant.topic);
         return true;
     }
@@ -121,7 +121,8 @@ public class CommentServiceImpl implements CommentService {
             commentDao.updateById(comment);
             RocketmqBody body = new RocketmqBody();
             body.setUserId(comment.getUserId());
-            body.setRelateId(comment.getId());
+            body.setPostId(comment.getPostId());
+            body.setCommentId(comment.getId());
             body.setType(MessageTypeConstant.DELETE_COMMENT);
             rocketmqProducer.syncSend(body, RocketmqConstant.topic);
             return true;

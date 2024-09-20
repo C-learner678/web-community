@@ -6,7 +6,7 @@ import lombok.Data;
 public class RocketmqBody {
     private Long userId;
     private Long fromUserId;
-    private Long relateId;
+    private Long postId;
+    private Long commentId;
     private Integer type;
-    private String message;
 }

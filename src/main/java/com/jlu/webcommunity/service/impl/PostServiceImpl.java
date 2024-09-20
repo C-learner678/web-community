@@ -221,7 +221,7 @@ public class PostServiceImpl implements PostService {
             postDao.updateById(post);
             RocketmqBody body = new RocketmqBody();
             body.setUserId(post.getUserId());
-            body.setRelateId(post.getId());
+            body.setPostId(post.getId());
             body.setType(MessageTypeConstant.DELETE_POST);
             rocketmqProducer.syncSend(body, RocketmqConstant.topic);
             return true;

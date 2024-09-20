@@ -3,6 +3,9 @@
     <div style="text-align:left;">
       <el-button size="small" @click="clickBack">回到首页</el-button>
       <div style="float:right;">
+        <el-button size="small" @click="clickSearch" icon="el-icon-search">站内搜索</el-button>
+        <el-button v-if="messageCnt == 0" size="small" @click="clickMessage" icon="el-icon-bell">消息通知</el-button>
+        <el-button v-else size="small" @click="clickMessage" icon="el-icon-bell">{{ messageCnt }}条新消息</el-button>
         <el-button size="small" @click="clickModifyPassword">修改密码</el-button>
         <el-button size="small" @click="clickLogout">退出登录</el-button>
       </div>
@@ -211,6 +214,7 @@ import { getCurrentUser, logout, modifyAvatar } from '@/api/userApi'
 import { getFollowNum, getFollowerNum } from '@/api/userFollowApi'
 import { getPostByPage, getPostCount, getPost, modifyPost, deletePost } from '@/api/postApi'
 import { getCollectPostByPage, modifyPostUserFoot } from '@/api/userFootApi'
+import { getNotifyMessageCount } from '@/api/notifyMessageApi';
 import UserFollowList from '@/components/UserFollowList.vue'
 import UserFollowerList from '@/components/UserFollowerList.vue'
 import ModifyUserInfo from '@/components/ModifyUserInfo.vue'
@@ -237,9 +241,17 @@ export default {
         this.$router.push("/login")
       });
     },
-    //回到首页
+    // 回到首页
     clickBack(){
       this.$router.push("/main")
+    },
+    // 查看通知
+    clickMessage(){
+      this.$router.push("/message")
+    },
+    // 帖子搜索
+    clickSearch(){
+      this.$router.push("/searchPost")
     },
     // 看关注用户列表
     clickUserFollow() {
@@ -469,6 +481,11 @@ export default {
           this.collectPosts[i].createTime = new Date(this.collectPosts[i].createTime).toLocaleString()
           this.collectPosts[i].updateTime = new Date(this.collectPosts[i].updateTime).toLocaleString()
         }
+      }).catch((error) => {
+      })
+      getNotifyMessageCount(false)
+      .then((res) => {
+        this.messageCnt = res.result
       }).catch((error) => {
       })
     }).catch((error) => {

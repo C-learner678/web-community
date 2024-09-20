@@ -155,7 +155,7 @@ public class UserFootServiceImpl implements UserFootService {
         if(dto.getType().equals(UserFootTypeEnum.LIKE) && dto.getPositive()){
             RocketmqBody body = new RocketmqBody();
             body.setFromUserId(UserContext.getUserData().getId());
-            body.setRelateId(dto.getPostId());
+            body.setPostId(dto.getPostId());
             body.setType(MessageTypeConstant.ADD_LIKE_POST);
             rocketmqProducer.syncSend(body, RocketmqConstant.topic);
         }
@@ -248,7 +248,7 @@ public class UserFootServiceImpl implements UserFootService {
         if(dto.getPositive()){
             RocketmqBody body = new RocketmqBody();
             body.setFromUserId(UserContext.getUserData().getId());
-            body.setRelateId(dto.getCommentId());
+            body.setCommentId(dto.getCommentId());
             body.setType(MessageTypeConstant.ADD_LIKE_COMMENT);
             rocketmqProducer.syncSend(body, RocketmqConstant.topic);
         }
