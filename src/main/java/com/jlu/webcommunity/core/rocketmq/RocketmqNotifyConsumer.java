@@ -20,26 +20,26 @@ import java.util.Objects;
 )
 public class RocketmqNotifyConsumer implements RocketMQListener<RocketmqBody> {
     @Autowired
-    private MqMessageService notifyMessageService;
+    private MqMessageService mqMessageService;
 
     @Override
     public void onMessage(RocketmqBody body) {
         if (Objects.equals(body.getType(), MessageTypeConstant.ADD_USER_FOLLOW)) {
-            notifyMessageService.notifyAddUserFollow(body.getUserId(), body.getFromUserId());
+            mqMessageService.notifyAddUserFollow(body.getUserId(), body.getFromUserId());
         }else if(Objects.equals(body.getType(), MessageTypeConstant.ADD_LIKE_POST)){
-            notifyMessageService.notifyAddLikePost(body.getFromUserId(), body.getPostId());
+            mqMessageService.notifyAddLikePost(body.getFromUserId(), body.getPostId());
         }else if(Objects.equals(body.getType(), MessageTypeConstant.ADD_COMMENT)){
-            notifyMessageService.notifyAddComment(body.getFromUserId(), body.getPostId(), body.getCommentId());
+            mqMessageService.notifyAddComment(body.getFromUserId(), body.getPostId(), body.getCommentId());
         }else if(Objects.equals(body.getType(), MessageTypeConstant.BAN_USER)){
-            notifyMessageService.notifyBanUser(body.getUserId());
+            mqMessageService.notifyBanUser(body.getUserId());
         }else if(Objects.equals(body.getType(), MessageTypeConstant.CANCEL_BAN_USER)){
-            notifyMessageService.notifyCancelBanUser(body.getUserId());
+            mqMessageService.notifyCancelBanUser(body.getUserId());
         }else if(Objects.equals(body.getType(), MessageTypeConstant.ADD_LIKE_COMMENT)){
-            notifyMessageService.notifyAddLikeComment(body.getFromUserId(), body.getCommentId());
+            mqMessageService.notifyAddLikeComment(body.getFromUserId(), body.getCommentId());
         }else if(Objects.equals(body.getType(), MessageTypeConstant.DELETE_POST)){
-            notifyMessageService.notifyDeletePost(body.getUserId(), body.getPostId());
+            mqMessageService.notifyDeletePost(body.getUserId(), body.getPostId());
         }else if(Objects.equals(body.getType(), MessageTypeConstant.DELETE_COMMENT)){
-            notifyMessageService.notifyDeleteComment(body.getUserId(), body.getPostId(), body.getCommentId());
+            mqMessageService.notifyDeleteComment(body.getUserId(), body.getPostId(), body.getCommentId());
         }
     }
 }

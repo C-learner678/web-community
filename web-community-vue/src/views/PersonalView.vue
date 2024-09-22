@@ -16,7 +16,7 @@
             </el-image>
             <div slot="tip" style="font-size: 12px;">只能上传jpg文件，且不超过2Mb</div>
           </el-upload>
-          <el-descriptions title="用户信息" :column="4">
+          <el-descriptions title="用户信息" :column="5">
             <template slot="extra">
               <el-button type="primary" size="small" @click="clickModifyInfo">修改信息</el-button>
               <el-button type="primary" size="small" @click="clickModifyPassword">修改密码</el-button>
@@ -29,6 +29,7 @@
             <el-descriptions-item label="我的粉丝">
               <el-button type="text" @click="clickUserFollower">{{ followerNum }}</el-button>
             </el-descriptions-item>
+            <el-descriptions-item label="活跃分数">{{ score }}</el-descriptions-item>
             <el-descriptions-item label="个人简介">{{ user.info }}</el-descriptions-item>
           </el-descriptions>
           <br>
@@ -206,6 +207,7 @@ import { getFollowNum, getFollowerNum } from '@/api/userFollowApi'
 import { getPostByPage, getPostCount, getPost, modifyPost, deletePost } from '@/api/postApi'
 import { getCollectPostByPage, modifyPostUserFoot } from '@/api/userFootApi'
 import { getNotifyMessageCount } from '@/api/notifyMessageApi';
+import { getScore } from '@/api/scoreApi'
 import UserFollowList from '@/components/UserFollowList.vue'
 import UserFollowerList from '@/components/UserFollowerList.vue'
 import ModifyUserInfo from '@/components/ModifyUserInfo.vue'
@@ -419,6 +421,7 @@ export default {
       uploadHeader: {},
       collectPosts: [],
       collectPageIndex: 1,
+      score: 0
     }
   },
   created() {
@@ -468,6 +471,11 @@ export default {
       getNotifyMessageCount(false)
       .then((res) => {
         this.messageCnt = res.result
+      }).catch((error) => {
+      })
+      getScore(this.user.userId)
+      .then((res) => {
+        this.score = res.result
       }).catch((error) => {
       })
     }).catch((error) => {

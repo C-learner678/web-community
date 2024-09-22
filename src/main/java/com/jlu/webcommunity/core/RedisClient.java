@@ -1,18 +1,18 @@
 package com.jlu.webcommunity.core;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
-//Redis工具类
+// Redis工具类
 @Service
 public class RedisClient {
     @Autowired
@@ -124,6 +124,29 @@ public class RedisClient {
 
     public Long sRemove(String key, Object... values) {
         return redisTemplate.opsForSet().remove(key, values);
+    }
+
+    public Double zIncr(String key, String value, Double score) {
+        return redisTemplate.opsForZSet().incrementScore(key, value, score);
+    }
+
+    public Double zScore(String key, String value){
+        return redisTemplate.opsForZSet().score(key, value);
+    }
+
+    // 获取分数最高的n个
+    public List<ImmutablePair<String, Double>> zTopNScore(String key, int n){
+        Set<ZSetOperations.TypedTuple<Object>> set = redisTemplate.opsForZSet().reverseRangeByScoreWithScores(key, 0, Integer.MAX_VALUE, 0, n);
+        if(set == null){
+            return new ArrayList<>();
+        }
+        return set.stream()
+                .map(tuple -> ImmutablePair.of(String.valueOf(tuple.getValue()), tuple.getScore()))
+                .sorted((o1, o2) -> Double.compare(o2.getRight(), o1.getRight())).collect(Collectors.toList());
+    }
+
+    public Set<Object> zRemove(String key, long start, long end){
+        return redisTemplate.opsForZSet().range(key, start, end);
     }
 
     public List<Object> lRange(String key, long start, long end) {

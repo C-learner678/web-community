@@ -141,6 +141,11 @@ public class PostServiceImpl implements PostService {
         post.setCreateTime(new Date());
         post.setUpdateTime(new Date());
         if(postDao.save(post)){
+            RocketmqBody body = new RocketmqBody();
+            body.setFromUserId(UserContext.getUserData().getId());
+            body.setPostId(post.getId());
+            body.setType(MessageTypeConstant.PUBLISH_POST);
+            rocketmqProducer.syncSend(body, RocketmqConstant.topic);
             return post.getId(); //返回自增主键（大于0）
         };
         return 0L;

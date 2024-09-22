@@ -9,4 +9,5 @@ public class MessageTypeConstant {
     public final static Integer ADD_LIKE_COMMENT = 6;
     public final static Integer DELETE_POST = 7;
     public final static Integer DELETE_COMMENT = 8;
+    public final static Integer PUBLISH_POST = 9;
 }

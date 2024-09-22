@@ -8,7 +8,7 @@
           <el-image style="width: 80px; height: 80px" :src="imageUrl">
             <original-avatar slot="error"></original-avatar>
           </el-image>
-          <el-descriptions title="" :column="4">
+          <el-descriptions title="" :column="5">
             <el-descriptions-item label="名称">{{ user.frontName }}</el-descriptions-item>
             <el-descriptions-item label="关注数">
               <el-button type="text" @click="clickUserFollow">{{ followNum }}</el-button>
@@ -27,6 +27,7 @@
                 已互粉
               </div>
             </el-descriptions-item>
+            <el-descriptions-item label="活跃分数">{{ score }}</el-descriptions-item>
             <el-descriptions-item label="个人简介">{{ user.info }}</el-descriptions-item>
           </el-descriptions>
           <el-button v-if="isCurrentUserFollow==false" size="small" type="primary" @click="clickAddFollow">
@@ -117,6 +118,7 @@ import BASE_URL from '@/request/baseUrl'
 import { getCurrentUser, getUserInfo, modifyUserStatus, getUserBanned } from '@/api/userApi'
 import { getPostByPage, getPostCount, adminDeletePost } from '@/api/postApi'
 import { getFollowNum, getFollowerNum, isFollow, addFollow, removeFollow } from '@/api/userFollowApi'
+import { getScore } from '@/api/scoreApi'
 import UserFollowList from '@/components/UserFollowList.vue'
 import UserFollowerList from '@/components/UserFollowerList.vue'
 import OriginalAvatar from '@/components/OriginalAvatar.vue'
@@ -219,7 +221,8 @@ export default {
       isCurrentUserFollow: false, // 当前用户已关注该用户
       isCurrentUserFollower: false, // 当前用户被该用户关注
       imageUrl: '',
-      banned: false
+      banned: false,
+      score: 0
     }
   },
   created() {
@@ -281,6 +284,11 @@ export default {
     getUserBanned(this.userId)
     .then((res) => {
       this.banned = res.result
+    }).catch((error) => {
+    })
+    getScore(this.userId)
+    .then((res) => {
+      this.score = res.result
     }).catch((error) => {
     })
   }
