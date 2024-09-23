@@ -1,6 +1,6 @@
 services:
   web-community:
-    image: web-community:0.1
+    image: web-community:latest
     container_name: web-community
     ports:
       - "8888:8888"
@@ -17,13 +17,14 @@ services:
     ports:
       - "6379:6379"
     volumes:
-      - /home/admin/data/redis/redis.conf:/etc/redis/redis.conf
+      - /home/admin/data/redis/conf:/etc/redis/conf
       - /home/admin/data/redis/data:/data
-    command: redis-server /etc/redis/redis.conf
+    command: redis-server /etc/redis/conf/redis.conf
 
   mysql:
     image: mysql:8
     container_name: mysql
+    restart: always
     environment:
       MYSQL_ROOT_PASSWORD: '123456'
       MYSQL_ALLOW_EMPTY_PASSWORD: 'no'

@@ -40,3 +40,6 @@ upload.txt
 src/main/resources/application-prod.yml
 src/main/resources/docker-compose.yml
 src/main/resources/docker-compose1.yml
+redisconf/
+./Dockerfile
+./docker-compose.yml
