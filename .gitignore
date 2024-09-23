@@ -35,11 +35,11 @@ build/
 ### log ###
 logs/
 
+Dockerfile
+docker-compose.yml
 start.txt
 upload.txt
 src/main/resources/application-prod.yml
-Dockerfile
-docker-compose.yml
 
 redisconf/
 
