@@ -37,8 +37,10 @@ logs/
 
 Dockerfile
 docker-compose.yml
+docker-compose(rocketmq).yml
 start.txt
 upload.txt
+src/main/resources/application.yml
 src/main/resources/application-prod.yml
 
 redisconf/
